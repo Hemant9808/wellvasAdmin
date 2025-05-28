@@ -12,13 +12,22 @@ const sampleOrders = [
 const OrdersPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
+  const [orders, setOrders] = useState(sampleOrders);
   const pageSize = 5;
 
+  const handleStatusChange = (id, newStatus) => {
+    setOrders(prev =>
+      prev.map(order =>
+        order.id === id ? { ...order, status: newStatus } : order
+      )
+    );
+  };
+
   const filteredOrders = useMemo(() => {
-    return sampleOrders.filter(order =>
+    return orders.filter(order =>
       order.customer.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [searchTerm]);
+  }, [searchTerm, orders]);
 
   const totalPages = Math.ceil(filteredOrders.length / pageSize);
   const currentOrders = filteredOrders.slice((page - 1) * pageSize, page * pageSize);
@@ -47,7 +56,7 @@ const OrdersPage = () => {
       </div>
 
       {/* Orders Table */}
-      <div className="overflow-x-auto bg-white shadow rounded">
+      <div className="overflow-x-auto bg-white shadow rounded hidden md:block">
         <table className="min-w-full divide-y divide-gray-200 text-sm">
           <thead className="bg-gray-100 text-gray-700">
             <tr>
@@ -65,24 +74,44 @@ const OrdersPage = () => {
                 <td className="p-3">{order.customer}</td>
                 <td className="p-3">{order.date}</td>
                 <td className="p-3">₹{order.amount}</td>
-                <td className="p-3">{order.status}</td>
+                <td className="p-3">
+                  <select
+                    value={order.status}
+                    onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                    className="border border-gray-300 rounded px-2 py-1 bg-white"
+                  >
+                    <option value="Delivered">Delivered</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
+      </div>
 
-        {/* Mobile View - Collapsible */}
-        <div className="md:hidden">
-          {currentOrders.map((order) => (
-            <div key={order.id} className="border rounded p-4 my-2 shadow">
-              <p><strong>Order ID:</strong> {order.id}</p>
-              <p><strong>Customer:</strong> {order.customer}</p>
-              <p><strong>Date:</strong> {order.date}</p>
-              <p><strong>Amount:</strong> ₹{order.amount}</p>
-              <p><strong>Status:</strong> {order.status}</p>
-            </div>
-          ))}
-        </div>
+      {/* Mobile View - Collapsible */}
+      <div className="md:hidden">
+        {currentOrders.map((order) => (
+          <div key={order.id} className="border rounded p-4 my-2 shadow bg-white">
+            <p><strong>Order ID:</strong> {order.id}</p>
+            <p><strong>Customer:</strong> {order.customer}</p>
+            <p><strong>Date:</strong> {order.date}</p>
+            <p><strong>Amount:</strong> ₹{order.amount}</p>
+            <p><strong>Status:</strong>{' '}
+              <select
+                value={order.status}
+                onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                className="border border-gray-300 rounded px-2 py-1 bg-white mt-1"
+              >
+                <option value="Delivered">Delivered</option>
+                <option value="Pending">Pending</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+            </p>
+          </div>
+        ))}
       </div>
 
       {/* Pagination */}

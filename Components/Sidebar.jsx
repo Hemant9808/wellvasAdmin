@@ -28,6 +28,9 @@ export default function Sidebar() {
           <Link to="/settings" className="text-gray-700 hover:text-black block">Settings</Link>
         </li>
         <li>
+          <Link to="/add-blogs" className="text-gray-700 hover:text-black block">Add Blogs</Link>
+        </li>
+        <li>
           <Link to="/addproducts" className="text-gray-700 hover:text-black block">Add Products</Link>
         </li>
         <li className="text-gray-700 hover:text-black cursor-pointer">Users</li>

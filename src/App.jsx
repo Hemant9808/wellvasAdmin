@@ -13,6 +13,7 @@ import Inventory from '../pages/InventoryPage';
 import Analysis from '../pages/AnalyticsPage';
 import Settings from '../pages/SettingsPage';
 import AddProducts from '../pages/AddProduct';
+import AddBlog from '../Pages/AddBlog';
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,7 @@ const router = createBrowserRouter([
       { path: 'analysis', element: <Analysis /> },
       { path: 'settings', element: <Settings /> },
       { path: 'addproducts', element: <AddProducts /> },
+      { path: 'add-blogs', element: <AddBlog /> },
     ],
   },
 ]);
