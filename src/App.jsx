@@ -20,16 +20,24 @@ import AddProduct from '../Pages/AddProduct';
 import BlogSection from '../Pages/Blogs/BlogSection';
 import LoginPage from '../Pages/LoginPage';
 import useAuthStore from '../utils/authStore';
+import { useAuthMiddleware } from '../middleware';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuthStore();
   
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
+  // if (!user) {
+  //   return <Navigate to="/login" replace />;
+  // }
 
   return children;
+};
+
+// Root component that includes the auth middleware
+const Root = () => {
+  useAuthMiddleware();
+  
+  return <Layout />;
 };
 
 const router = createBrowserRouter([
@@ -40,9 +48,9 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: (
-      <ProtectedRoute>
-        <Layout />
-      </ProtectedRoute>
+      // <ProtectedRoute>
+        <Root />
+      // </ProtectedRoute>
     ),
     children: [
       { index: true, element: <Dashboard /> },

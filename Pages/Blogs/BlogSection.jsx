@@ -176,7 +176,7 @@ const BlogSection = () => {
           <h2 className="text-3xl font-semibold text-gray-800">
             Our Latest Posts
           </h2>
-          {isAdmin && (
+         
             <button
               onClick={() => {
                 resetForm();
@@ -186,11 +186,11 @@ const BlogSection = () => {
             >
               Add New Blog
             </button>
-          )}
+         
         </div>
 
         {/* Blog Dialog - Only show if user is admin */}
-        {isAdmin && isDialogOpen && (
+        {isDialogOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
               <h3 className="text-2xl font-semibold mb-4">
@@ -351,7 +351,7 @@ const BlogSection = () => {
                     >
                       Read More →
                     </Link>
-                    {isAdmin && (
+               
                       <div className=" flex gap-4">
                         <button
                           onClick={() => handleEdit(post)}
@@ -366,7 +366,7 @@ const BlogSection = () => {
                           Delete
                         </button>
                       </div>
-                    )}
+                
                   </div>
               </div>
             </div>

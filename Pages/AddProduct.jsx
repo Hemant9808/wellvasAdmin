@@ -246,6 +246,7 @@ export default function AddProduct() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {categories.map((category) => (
                 <div
+                onClick={() => handleCategorySelect(category._id)}
                   key={category._id}
                   className={`p-6 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-lg ${
                     selectedCategory === category._id
@@ -279,7 +280,9 @@ export default function AddProduct() {
                         </button>
                       </div>
                     ) : (
-                      <>
+                      <div 
+                      
+                      >
                         <h4 
                           className="font-medium text-lg"
                           onClick={() => handleCategorySelect(category._id)}
@@ -311,7 +314,7 @@ export default function AddProduct() {
                             <FiTrash2 />
                           </button>
                         </div>
-                      </>
+                      </div>
                     )}
                   </div>
                 </div>

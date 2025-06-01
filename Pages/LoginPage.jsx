@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import axiosInstance from '../utils/axios';
@@ -12,7 +12,7 @@ const LoginPage = () => {
     password: ''
   });
   const [loading, setLoading] = useState(false);
-
+  const token = localStorage.getItem("token")
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -26,7 +26,7 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const response = await axiosInstance.post('/adminLogin', formData);
+      const response = await axiosInstance.post('/auth/adminLogin', formData);
       
       if (response.data.status === 'success') {
         // Store token in localStorage
@@ -45,6 +45,14 @@ const LoginPage = () => {
       setLoading(false);
     }
   };
+  useEffect(()=>{
+    if(token){
+        console.log("knsb")
+        navigate('/');
+      }
+  },[])
+
+ 
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
