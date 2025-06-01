@@ -15,9 +15,9 @@ export default function Sidebar() {
         <li>
           <Link to="/products" className="text-gray-700 hover:text-black block">Products</Link>
         </li>
-        <li>
+        {/* <li>
           <Link to="/customers" className="text-gray-700 hover:text-black block">Customers</Link>
-        </li>
+        </li> */}
         <li>
           <Link to="/inventory" className="text-gray-700 hover:text-black block">Inventory</Link>
         </li>

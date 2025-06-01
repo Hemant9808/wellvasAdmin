@@ -109,39 +109,9 @@ export default function ProductsPage() {
     <div className="p-4">
       {/* Categories Section */}
       <div className="mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Categories</h2>
-          <button
-            onClick={() => setShowAddCategory(true)}
-            className="bg-green-600 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-green-700"
-          >
-            <FiPlus /> Add Category
-          </button>
-        </div>
+        
 
-        {showAddCategory && (
-          <div className="mb-4 p-4 border rounded bg-white">
-            <input
-              type="text"
-              value={newCategory}
-              onChange={(e) => setNewCategory(e.target.value)}
-              placeholder="Enter category name"
-              className="border px-3 py-2 rounded w-full md:w-64 mr-2"
-            />
-            <button
-              onClick={handleAddCategory}
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-            >
-              Save
-            </button>
-            <button
-              onClick={() => setShowAddCategory(false)}
-              className="ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-            >
-              Cancel
-            </button>
-          </div>
-        )}
+        
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {categories.map((category) => (
@@ -157,7 +127,7 @@ export default function ProductsPage() {
             >
               <div className="flex justify-between items-center">
                 <h3 className="font-medium">{category.name}</h3>
-                <button
+                {/* <button
                   onClick={(e) => {
                     e.stopPropagation();
                     handleDeleteCategory(category._id);
@@ -165,7 +135,7 @@ export default function ProductsPage() {
                   className="text-red-600 hover:text-red-800"
                 >
                   <FiTrash2 />
-                </button>
+                </button> */}
               </div>
             </div>
           ))}
