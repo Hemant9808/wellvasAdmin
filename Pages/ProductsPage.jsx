@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { FiSearch, FiDownload, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import { FiSearch, FiDownload, FiEdit2, FiTrash2, FiPlus } from 'react-icons/fi';
 import { CSVLink } from 'react-csv';
 import axiosInstance from '../utils/axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
@@ -11,13 +12,16 @@ export default function ProductsPage() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const pageSize = 10;
   const [loading, setLoading] = useState(false);
+  const [showAddCategory, setShowAddCategory] = useState(true);
+  const [newCategory, setNewCategory] = useState('');
+  const pageSize = 10;
 
   useEffect(() => {
     fetchCategories();
     fetchProducts();
   }, []);
+  
 
   const fetchCategories = async () => {
     try {
@@ -46,12 +50,35 @@ export default function ProductsPage() {
     }
   };
 
-  // Handle category filter
-  const handleCategoryChange = (e) => {
-    const cat = e.target.value;
-    setSelectedCategory(cat);
-    setPage(1);
-    fetchProducts(cat);
+  const handleAddCategory = async () => {
+    if (!newCategory.trim()) {
+      toast.error('Category name is required');
+      return;
+    }
+    try {
+      await axiosInstance.post('/product/addCategory', { name: newCategory });
+      toast.success('Category added successfully');
+      setNewCategory('');
+      setShowAddCategory(false);
+      fetchCategories();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to add category');
+    }
+  };
+
+  const handleDeleteCategory = async (categoryId) => {
+    if (!window.confirm('Are you sure you want to delete this category?')) return;
+    try {
+      await axiosInstance.delete(`/product/deleteCategory/${categoryId}`);
+      toast.success('Category deleted successfully');
+      fetchCategories();
+      if (selectedCategory === categoryId) {
+        setSelectedCategory('');
+        fetchProducts();
+      }
+    } catch (err) {
+      toast.error('Failed to delete category');
+    }
   };
 
   // Search filter
@@ -62,11 +89,11 @@ export default function ProductsPage() {
   const totalPages = Math.ceil(filtered.length / pageSize);
   const paginated = filtered.slice((page - 1) * pageSize, page * pageSize);
 
-  // Edit and Delete handlers (implement navigation and API call as needed)
+  // Edit and Delete handlers
   const handleEdit = (id) => {
     toast.info('Edit product: ' + id);
-    // navigate(`/edit-product/${id}`) or open modal
   };
+
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this product?')) return;
     try {
@@ -80,6 +107,72 @@ export default function ProductsPage() {
 
   return (
     <div className="p-4">
+      {/* Categories Section */}
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">Categories</h2>
+          <button
+            onClick={() => setShowAddCategory(true)}
+            className="bg-green-600 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-green-700"
+          >
+            <FiPlus /> Add Category
+          </button>
+        </div>
+
+        {showAddCategory && (
+          <div className="mb-4 p-4 border rounded bg-white">
+            <input
+              type="text"
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              placeholder="Enter category name"
+              className="border px-3 py-2 rounded w-full md:w-64 mr-2"
+            />
+            <button
+              onClick={handleAddCategory}
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            >
+              Save
+            </button>
+            <button
+              onClick={() => setShowAddCategory(false)}
+              className="ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {categories.map((category) => (
+            <div
+              key={category._id}
+              className={`p-4 border rounded shadow-sm cursor-pointer transition-all ${
+                selectedCategory === category._id ? 'bg-green-50 border-green-500' : 'bg-white hover:shadow-md'
+              }`}
+              onClick={() => {
+                setSelectedCategory(category._id);
+                fetchProducts(category.name);
+              }}
+            >
+              <div className="flex justify-between items-center">
+                <h3 className="font-medium">{category.name}</h3>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteCategory(category._id);
+                  }}
+                  className="text-red-600 hover:text-red-800"
+                >
+                  <FiTrash2 />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Products Section */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
         <div className="flex items-center gap-2 w-full md:w-auto">
           <FiSearch className="text-gray-500" />
@@ -91,16 +184,6 @@ export default function ProductsPage() {
             className="border px-3 py-1 rounded w-full md:w-64"
           />
         </div>
-        <select
-          className="border px-3 py-1 rounded w-full md:w-64"
-          value={selectedCategory}
-          onChange={handleCategoryChange}
-        >
-          <option value="">All Categories</option>
-          {categories.map((cat) => (
-            <option key={cat._id} value={cat.name}>{cat.name}</option>
-          ))}
-        </select>
         <CSVLink
           data={filtered}
           filename="products.csv"

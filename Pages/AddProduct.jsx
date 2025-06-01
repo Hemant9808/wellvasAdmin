@@ -4,6 +4,7 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "../utils/axios";
+import { FiPlus, FiX, FiCheck, FiEdit2, FiTrash2 } from "react-icons/fi";
 
 export default function AddProduct() {
   const [categories, setCategories] = useState([]);
@@ -11,6 +12,9 @@ export default function AddProduct() {
   const [subcategories, setSubcategories] = useState([]);
   const [newSubcategory, setNewSubcategory] = useState("");
   const [selectedSubcategories, setSelectedSubcategories] = useState([]);
+  const [showAddCategory, setShowAddCategory] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
+  const [editingCategory, setEditingCategory] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -38,11 +42,55 @@ export default function AddProduct() {
     }
   };
 
+  const handleAddCategory = async () => {
+    if (!newCategory.trim()) {
+      toast.error("Category name is required");
+      return;
+    }
+    try {
+      await axiosInstance.post("/product/addOrUpdateCategory", { name: newCategory });
+      toast.success("Category added successfully");
+      setNewCategory("");
+      setShowAddCategory(false);
+      fetchCategories();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to add category");
+    }
+  };
+
+  const handleEditCategory = async (categoryId, newName) => {
+    try {
+      await axiosInstance.post("/product/addOrUpdateCategory", { 
+        _id: categoryId,
+        name: newName 
+      });
+      toast.success("Category updated successfully");
+      setEditingCategory(null);
+      fetchCategories();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to update category");
+    }
+  };
+
+  const handleDeleteCategory = async (categoryId) => {
+    // if (!window.confirm("Are you sure you want to delete this category?")) return;
+    try {
+      await axiosInstance.delete(`/product/deleteCategory/${categoryId}`);
+      toast.success("Category deleted successfully");
+      if (selectedCategory === categoryId) {
+        setSelectedCategory("");
+      }
+      fetchCategories();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to delete category");
+    }
+  };
+
   // Handle category selection
-  const handleCategorySelect = (e) => {
-    setSelectedCategory(e.target.value);
+  const handleCategorySelect = (categoryId) => {
+    setSelectedCategory(categoryId);
     setSelectedSubcategories([]);
-    setSubcategories([]); // Reset subcategories for new category
+    setSubcategories([]);
   };
 
   // Handle drag and drop
@@ -155,22 +203,120 @@ export default function AddProduct() {
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto bg-white shadow rounded-lg p-6">
         <h2 className="text-2xl font-bold text-center mb-6">Create New Product</h2>
-        {/* Category selection first */}
+        
+        {/* Category Selection Section */}
         {!selectedCategory ? (
-          <div className="mb-8 flex flex-col items-center">
-            <label className="font-medium mb-2">Select Category to Add Product</label>
-            <select
-              className="border rounded-md p-2 w-80"
-              value={selectedCategory}
-              onChange={handleCategorySelect}
-            >
-              <option value="">Choose category</option>
-              {categories.map((cat) => (
-                <option key={cat._id} value={cat.name}>
-                  {cat.name}
-                </option>
+          <div className="mb-8">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-semibold">Select a Category</h3>
+              <button
+                onClick={() => setShowAddCategory(true)}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700 transition-colors"
+              >
+                <FiPlus /> Add New Category
+              </button>
+            </div>
+
+            {showAddCategory && (
+              <div className="mb-6 p-4 border rounded-lg bg-gray-50">
+                <div className="flex items-center gap-4">
+                  <input
+                    type="text"
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    placeholder="Enter category name"
+                    className="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                  <button
+                    onClick={handleAddCategory}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+                  >
+                    <FiCheck /> Save
+                  </button>
+                  <button
+                    onClick={() => setShowAddCategory(false)}
+                    className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors flex items-center gap-2"
+                  >
+                    <FiX /> Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {categories.map((category) => (
+                <div
+                  key={category._id}
+                  className={`p-6 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-lg ${
+                    selectedCategory === category._id
+                      ? "bg-green-50 border-green-500 shadow-md"
+                      : "bg-white hover:border-green-300"
+                  }`}
+                >
+                  <div className="flex flex-col items-center text-center">
+                    <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-3 ${
+                      selectedCategory === category._id ? "bg-green-100" : "bg-gray-100"
+                    }`}>
+                      <span className="text-2xl">📦</span>
+                    </div>
+                    {editingCategory === category._id ? (
+                      <div className="flex items-center gap-2 w-full">
+                        <input
+                          type="text"
+                          defaultValue={category.name}
+                          className="border rounded px-2 py-1 flex-1"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              handleEditCategory(category._id, e.target.value);
+                            }
+                          }}
+                        />
+                        <button
+                          onClick={() => setEditingCategory(null)}
+                          className="text-gray-500 hover:text-gray-700"
+                        >
+                          <FiX />
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <h4 
+                          className="font-medium text-lg"
+                          onClick={() => handleCategorySelect(category._id)}
+                        >
+                          {category.name}
+                        </h4>
+                        <p className="text-sm text-gray-500 mt-1">
+                          {category.subcategories?.length || 0} subcategories
+                        </p>
+                        <div className="flex gap-2 mt-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingCategory(category._id);
+                            }}
+                            className="text-blue-600 hover:text-blue-800 p-1"
+                            title="Edit category"
+                          >
+                            <FiEdit2 />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteCategory(category._id);
+                            }}
+                            className="text-red-600 hover:text-red-800 p-1"
+                            title="Delete category"
+                          >
+                            <FiTrash2 />
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
               ))}
-            </select>
+            </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -363,8 +509,8 @@ export default function AddProduct() {
             </div>
           </form>
         )}
+        <ToastContainer />
       </div>
-      <ToastContainer />
     </div>
   );
 }
