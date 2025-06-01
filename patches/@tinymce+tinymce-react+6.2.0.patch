@@ -1,0 +1,19 @@
+diff --git a/node_modules/@tinymce/tinymce-react/lib/es2015/main/ts/Utils.js b/node_modules/@tinymce/tinymce-react/lib/es2015/main/ts/Utils.js
+index f41618d..49b588d 100644
+--- a/node_modules/@tinymce/tinymce-react/lib/es2015/main/ts/Utils.js
++++ b/node_modules/@tinymce/tinymce-react/lib/es2015/main/ts/Utils.js
+@@ -1,6 +1,6 @@
+ import { eventPropTypes } from './components/EditorPropTypes';
+ import { getTinymce } from './TinyMCE';
+-import { TinyVer } from '@tinymce/miniature';
++// import { TinyVer } from '@tinymce/miniature';
+ export var isFunction = function (x) { return typeof x === 'function'; };
+ var isEventProp = function (name) { return name in eventPropTypes; };
+ var eventAttrToEventName = function (attrName) { return attrName.substr(2); };
+@@ -79,5 +79,5 @@ export var getTinymceOrError = function (view) {
+ };
+ export var isDisabledOptionSupported = function (view) {
+     var tinymce = getTinymceOrError(view);
+-    return !TinyVer.isLessThan(tinymce, '7.6.0');
++    // return !TinyVer.isLessThan(tinymce, '7.6.0');
+ };
