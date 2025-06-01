@@ -6,13 +6,13 @@ import {
 
 import Layout from '../Components/Layout';
 import Dashboard from '../Pages/Dashboard';
-import Orders from '../pages/OrdersPage';
-import Products from '../pages/ProductsPage';
-import Customers from '../pages/CustomersPage';
-import Inventory from '../pages/InventoryPage';
-import Analysis from '../pages/AnalyticsPage';
+import Orders from '../Pages/OrdersPage';
+import Products from '../Pages/ProductsPage';
+import Customers from '../Pages/CustomersPage';
+import Inventory from '../Pages/InventoryPage';
+import Analysis from '../Pages/AnalyticsPage';
 //@ts-ignore
-import Settings from '../pages/SettingsPage';
+import Settings from '../Pages/SettingsPage';
 
 import AddBlog from '../Pages/AddBlog';
 import AddProduct from '../Pages/AddProduct';
