@@ -50,7 +50,7 @@ const LoginPage = () => {
         console.log("knsb")
         navigate('/');
       }
-  },[])
+  },[token])
 
  
 
