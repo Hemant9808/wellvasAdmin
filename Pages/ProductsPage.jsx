@@ -1,22 +1,60 @@
-import { useState } from 'react';
-import { FiSearch, FiDownload } from 'react-icons/fi';
+import { useState, useEffect } from 'react';
+import { FiSearch, FiDownload, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { CSVLink } from 'react-csv';
-
-const initialProducts = [
-  { id: 1, name: 'Gokshura', price: '₹499', stock: 120 },
-  { id: 2, name: 'Shilajit', price: '₹799', stock: 65 },
-  { id: 3, name: 'Ashwagandha', price: '₹699', stock: 90 },
-  { id: 4, name: 'Protein Bar', price: '₹199', stock: 200 },
-  { id: 5, name: 'Herbal Tea', price: '₹299', stock: 40 },
-  { id: 6, name: 'Wellness Capsules', price: '₹399', stock: 100 },
-];
+import axiosInstance from '../utils/axios';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState(initialProducts);
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const pageSize = 4;
+  const pageSize = 10;
+  const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    fetchCategories();
+    fetchProducts();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const res = await axiosInstance.get('/product/getAllCategories');
+      setCategories(res.data);
+    } catch (err) {
+      toast.error('Failed to fetch categories');
+    }
+  };
+
+  const fetchProducts = async (category = '') => {
+    setLoading(true);
+    try {
+      let res;
+      if (category) {
+        res = await axiosInstance.get(`/product/getProductByCategories?category=${encodeURIComponent(category)}`);
+        setProducts(res.data);
+      } else {
+        res = await axiosInstance.get('/product/getAllProducts');
+        setProducts(res.data);
+      }
+    } catch (err) {
+      toast.error('Failed to fetch products');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle category filter
+  const handleCategoryChange = (e) => {
+    const cat = e.target.value;
+    setSelectedCategory(cat);
+    setPage(1);
+    fetchProducts(cat);
+  };
+
+  // Search filter
   const filtered = products.filter((product) =>
     product.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -24,14 +62,20 @@ export default function ProductsPage() {
   const totalPages = Math.ceil(filtered.length / pageSize);
   const paginated = filtered.slice((page - 1) * pageSize, page * pageSize);
 
-  const updateStock = (id, delta) => {
-    setProducts((prev) =>
-      prev.map((product) =>
-        product.id === id
-          ? { ...product, stock: Math.max(0, product.stock + delta) }
-          : product
-      )
-    );
+  // Edit and Delete handlers (implement navigation and API call as needed)
+  const handleEdit = (id) => {
+    toast.info('Edit product: ' + id);
+    // navigate(`/edit-product/${id}`) or open modal
+  };
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this product?')) return;
+    try {
+      await axiosInstance.delete(`/product/deleteProduct/${id}`);
+      toast.success('Product deleted');
+      fetchProducts(selectedCategory);
+    } catch (err) {
+      toast.error('Failed to delete product');
+    }
   };
 
   return (
@@ -47,6 +91,16 @@ export default function ProductsPage() {
             className="border px-3 py-1 rounded w-full md:w-64"
           />
         </div>
+        <select
+          className="border px-3 py-1 rounded w-full md:w-64"
+          value={selectedCategory}
+          onChange={handleCategoryChange}
+        >
+          <option value="">All Categories</option>
+          {categories.map((cat) => (
+            <option key={cat._id} value={cat.name}>{cat.name}</option>
+          ))}
+        </select>
         <CSVLink
           data={filtered}
           filename="products.csv"
@@ -60,33 +114,47 @@ export default function ProductsPage() {
         <table className="min-w-full table-auto border rounded shadow bg-white">
           <thead className="bg-gray-100">
             <tr>
-              <th className="text-left p-2 border">ID</th>
+              <th className="text-left p-2 border">Image</th>
               <th className="text-left p-2 border">Product Name</th>
+              <th className="text-left p-2 border">Brand</th>
               <th className="text-left p-2 border">Price</th>
               <th className="text-left p-2 border">Stock</th>
               <th className="text-left p-2 border">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {paginated.map((product) => (
-              <tr key={product.id} className="hover:bg-gray-50">
-                <td className="p-2 border">{product.id}</td>
+            {loading ? (
+              <tr><td colSpan={6} className="text-center p-4">Loading...</td></tr>
+            ) : paginated.length === 0 ? (
+              <tr><td colSpan={6} className="text-center p-4">No products found</td></tr>
+            ) : paginated.map((product) => (
+              <tr key={product._id} className="hover:bg-gray-50">
+                <td className="p-2 border">
+                  {product.images && product.images.length > 0 ? (
+                    <img src={product.images[0].url} alt={product.name} className="w-14 h-14 object-cover rounded" />
+                  ) : (
+                    <span className="text-gray-400">No Image</span>
+                  )}
+                </td>
                 <td className="p-2 border">{product.name}</td>
-                <td className="p-2 border">{product.price}</td>
+                <td className="p-2 border">{product.brand}</td>
+                <td className="p-2 border">₹{product.price}</td>
                 <td className="p-2 border">{product.stock}</td>
                 <td className="p-2 border">
                   <div className="flex gap-2">
                     <button
-                      onClick={() => updateStock(product.id, -1)}
-                      className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                      onClick={() => handleEdit(product._id)}
+                      className="text-blue-600 hover:text-blue-800"
+                      title="Edit"
                     >
-                      –
+                      <FiEdit2 />
                     </button>
                     <button
-                      onClick={() => updateStock(product.id, 1)}
-                      className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
+                      onClick={() => handleDelete(product._id)}
+                      className="text-red-600 hover:text-red-800"
+                      title="Delete"
                     >
-                      +
+                      <FiTrash2 />
                     </button>
                   </div>
                 </td>
@@ -124,6 +192,7 @@ export default function ProductsPage() {
           Next
         </button>
       </div>
+      <ToastContainer />
     </div>
   );
 }

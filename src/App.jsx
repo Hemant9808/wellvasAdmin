@@ -11,9 +11,13 @@ import Products from '../pages/ProductsPage';
 import Customers from '../pages/CustomersPage';
 import Inventory from '../pages/InventoryPage';
 import Analysis from '../pages/AnalyticsPage';
+//@ts-ignore
 import Settings from '../pages/SettingsPage';
-import AddProducts from '../pages/AddProduct';
+
 import AddBlog from '../Pages/AddBlog';
+import AddProduct from '../Pages/AddProduct';
+
+
 
 const router = createBrowserRouter([
   {
@@ -27,8 +31,9 @@ const router = createBrowserRouter([
       { path: 'inventory', element: <Inventory /> },
       { path: 'analysis', element: <Analysis /> },
       { path: 'settings', element: <Settings /> },
-      { path: 'addproducts', element: <AddProducts /> },
+      // { path: 'addproducts', element: <AddProducts /> },
       { path: 'add-blogs', element: <AddBlog /> },
+      { path: 'addproducts', element: <AddProduct /> },
     ],
   },
 ]);
