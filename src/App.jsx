@@ -53,8 +53,8 @@ const router = createBrowserRouter([
       // </ProtectedRoute>
     ),
     children: [
-      { index: true, element: <Dashboard /> },
-      { path: 'orders', element: <Orders /> },
+      { index: true, element: <Orders /> },
+      { path: 'dashboard', element: <Dashboard /> },
       { path: 'products', element: <Products /> },
       { path: 'customers', element: <Customers /> },
       { path: 'inventory', element: <Inventory /> },

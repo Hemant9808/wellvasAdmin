@@ -154,7 +154,7 @@ const OrdersPage = () => {
 
         </div>
 
-        <div className='flex justify-between gap-3 mb-4 ' >
+        <div className='flex justify-between gap-3 mb-4 flex-wrap ' >
         <div className="bg-gradient-to-r w-[20rem] from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 transform hover:scale-105 transition-transform">
             <div className="flex items-center">
               <div className="p-3 rounded-full bg-white text-blue-600">

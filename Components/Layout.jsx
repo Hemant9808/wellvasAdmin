@@ -1,17 +1,18 @@
 // src/components/Layout.jsx
 import React, { useState } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
-import { FiMenu, FiX, FiChevronRight, FiChevronLeft, FiHome, FiShoppingBag, FiUsers, FiPackage, FiBarChart2, FiSettings, FiShoppingCart } from 'react-icons/fi';
+import { FiMenu, FiX, FiChevronRight, FiChevronLeft, FiHome, FiShoppingBag, FiUsers, FiPackage, FiBarChart2, FiSettings, FiShoppingCart, FiFileText } from 'react-icons/fi';
 
 const Layout = () => {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const menuItems = [
-    { path: '/', icon: <FiHome />, label: 'Dashboard' },
-    { path: '/orders', icon: <FiShoppingCart />, label: 'Orders' },
+    { path: '/dashboard', icon: <FiHome />, label: 'Dashboard' },
+    { path: '/', icon: <FiShoppingCart />, label: 'Orders' },
     { path: '/products', icon: <FiShoppingBag />, label: 'Products' },
     { path: '/customers', icon: <FiUsers />, label: 'Customers' },
     { path: '/inventory', icon: <FiPackage />, label: 'Inventory' },
+    { path: '/add-blogs', icon: <FiFileText />, label: 'Blogs' },
     { path: '/analysis', icon: <FiBarChart2 />, label: 'Analysis' },
     { path: '/settings', icon: <FiSettings />, label: 'Settings' },
   ];
