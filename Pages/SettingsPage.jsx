@@ -5,6 +5,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { toast } from "react-toastify";
 import { FiStar, FiTrendingUp } from "react-icons/fi";
+import AdminProfile from "../Components/UserSetting";
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('general');
@@ -102,26 +103,7 @@ export default function SettingsPage() {
 
       {/* General Settings */}
       {activeTab === 'general' && (
-        <div className="space-y-6">
-          <div className="bg-white p-6 rounded shadow">
-            <h3 className="text-lg font-semibold mb-4">Admin Details</h3>
-            <div className="grid gap-4">
-              <input type="text" placeholder="Admin Name" className="border px-3 py-2 rounded w-full" />
-              <input type="email" placeholder="Admin Email" className="border px-3 py-2 rounded w-full" />
-              <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save Changes</button>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded shadow">
-            <h3 className="text-lg font-semibold mb-4">Change Password</h3>
-            <div className="grid gap-4">
-              <input type="password" placeholder="Current Password" className="border px-3 py-2 rounded w-full" />
-              <input type="password" placeholder="New Password" className="border px-3 py-2 rounded w-full" />
-              <input type="password" placeholder="Confirm New Password" className="border px-3 py-2 rounded w-full" />
-              <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Update Password</button>
-            </div>
-          </div>
-        </div>
+      <AdminProfile/>
       )}
 
       {/* Payment Settings */}

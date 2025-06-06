@@ -224,7 +224,12 @@ const OrdersPage = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {orders.map((order) => (
                   <tr key={order._id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td
+                    onClick={() => {
+                      // Navigate to order details page
+                      window.location.href = `/orders/${order._id}`;
+                    }}
+                     className="px-6 py-4 cursor-pointer whitespace-nowrap text-sm text-[#3c65e1]">
                       {order._id}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">

@@ -21,6 +21,7 @@ import BlogSection from '../Pages/Blogs/BlogSection';
 import LoginPage from '../Pages/LoginPage';
 import useAuthStore from '../utils/authStore';
 import { useAuthMiddleware } from '../middleware';
+import OrderDetails from '../Pages/OrderDetails';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -60,10 +61,11 @@ const router = createBrowserRouter([
       { path: 'inventory', element: <Inventory /> },
       { path: 'analysis', element: <Analysis /> },
       { path: 'settings', element: <Settings /> },
-      // { path: 'addproducts', element: <AddProducts /> },
+      // { path: 'addproducts', element: <AddProduct /> },
       // { path: 'add-blogs', element: <AddBlog /> },
       { path: 'add-blogs', element: <BlogSection /> },
       { path: 'addproducts', element: <AddProduct /> },
+      { path: 'orders/:id', element: <OrderDetails /> },
     ],
   },
 ]);
