@@ -31,6 +31,7 @@ const LoginPage = () => {
       if (response.data.status === 'success') {
         // Store token in localStorage
         localStorage.setItem('token', response.data.token);
+        localStorage.setItem('authStorage', JSON.stringify(response.data.data.admin));
         
         // Update auth store
         setUser(response.data.data.admin);

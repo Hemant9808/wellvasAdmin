@@ -159,10 +159,10 @@ export default function AddProduct() {
       toast.error("Please upload at least one image");
       return;
     }
-    if (selectedSubcategories.length === 0) {
-      toast.error("Please select or add at least one subcategory");
-      return;
-    }
+    // if (selectedSubcategories.length === 0) {
+    //   toast.error("Please select or add at least one subcategory");
+    //   return;
+    // }
     setLoading(true);
     try {
       const payload = {
@@ -171,7 +171,7 @@ export default function AddProduct() {
         category: [selectedCategory],
         subcategories: selectedSubcategories,
       };
-      const res = await axiosInstance.post("/product/addOrUpdateCategory", payload);
+      const res = await axiosInstance.post("/product/addProducts", payload);
       if (res.data.success) {
         toast.success("Product added successfully");
         setFormData({

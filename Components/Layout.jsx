@@ -27,7 +27,7 @@ const Layout = () => {
   ];
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex overflow-hidden max-h-screen bg-gray-100">
       {/* Sidebar */}
       <div
         className={`bg-white shadow-lg transition-all duration-300 ${
@@ -79,9 +79,23 @@ const Layout = () => {
               {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
             </div>
             {isExpanded && (
-              <div className="ml-3">
+              <div className="ml-3 flex ">
+              <div className="flex flex-col">
                 <p className="text-sm font-medium text-gray-700">{user?.name || 'User'}</p>
                 <p className="text-xs text-gray-500">{user?.email || 'user@example.com'}</p>
+              </div>
+                 <div className="ml-3 bg-red-400 text-white p-1 rounded-lg cursor-pointer  transition-colors">
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem('authStorage');
+                      localStorage.removeItem('token');
+                      window.location.reload();
+                    }}
+                    className=" cursor-pointer text-sm"
+                  >
+                    Logout
+                  </button> 
+                  </div>
               </div>
             )}
           </div>
