@@ -1,103 +1,192 @@
-import { useState } from 'react';
-import { FiSearch, FiDownload } from 'react-icons/fi';
-import { CSVLink } from 'react-csv';
+import React, { useEffect, useState } from 'react';
+import axiosInstance from '../utils/axios';
 
-const dummyCustomers = [
-  { id: 1, name: 'Ravi Sharma', email: 'ravi@example.com', orders: 3, totalSpent: '₹1397' },
-  { id: 2, name: 'Ananya Mehta', email: 'ananya@example.com', orders: 1, totalSpent: '₹499' },
-  { id: 3, name: 'Vikram Rao', email: 'vikram@example.com', orders: 5, totalSpent: '₹2197' },
-  { id: 4, name: 'Pooja Singh', email: 'pooja@example.com', orders: 2, totalSpent: '₹1398' },
-  { id: 5, name: 'Amit Joshi', email: 'amit@example.com', orders: 4, totalSpent: '₹1896' },
-  { id: 6, name: 'Nidhi Verma', email: 'nidhi@example.com', orders: 2, totalSpent: '₹998' },
-];
+const TABS = ['Get User', 'All Users', 'Frequent Buyers'];
 
-export default function CustomersPage() {
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const pageSize = 4;
+function UserDashboard() {
+  const [activeTab, setActiveTab] = useState(0);
 
-  const filtered = dummyCustomers.filter((cust) =>
-    cust.name.toLowerCase().includes(search.toLowerCase())
+  const [userQuery, setUserQuery] = useState({ userId: '', email: '' });
+  const [userData, setUserData] = useState(null);
+
+  const [allUsers, setAllUsers] = useState([]);
+  const [frequentBuyers, setFrequentBuyers] = useState([]);
+  const [pagination, setPagination] = useState({ page: 1, limit: 10 });
+
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const fetchUser = async () => {
+    try {
+      setError('');
+      setLoading(true);
+      const res = await axiosInstance.post('/auth/getUser', userQuery);
+      setUserData(res.data.user);
+    } catch (err) {
+      setUserData(null);
+      setError(err.response?.data?.message || 'Failed to fetch user');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAllUsers = async () => {
+    try {
+      setError('');
+      setLoading(true);
+      const res = await axiosInstance.get(`/auth/getAllUsers?page=${pagination.page}&limit=${pagination.limit}`);
+      setAllUsers(res.data.users);
+    } catch (err) {
+      setError('Failed to fetch all users');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchFrequentBuyers = async () => {
+    try {
+      setError('');
+      setLoading(true);
+      const res = await axiosInstance.post(`/auth/buyers`,{
+        page: pagination.page,
+        limit: pagination.limit
+      });
+      setFrequentBuyers(res.data.buyers);
+    } catch (err) {
+      setError('Failed to fetch frequent buyers');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 1) fetchAllUsers();
+    if (activeTab === 2) fetchFrequentBuyers();
+  }, [activeTab, pagination.page]);
+
+  const renderTable = (rows) => (
+    <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+      <thead className="bg-gray-100 text-left">
+        <tr>
+          <th className="py-2 px-4">Name</th>
+          <th className="py-2 px-4">Email</th>
+          <th className="py-2 px-4">Phone</th>
+          <th className="py-2 px-4">Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((u, idx) => (
+          <tr key={idx} className="border-t">
+            <td className="py-2 px-4">{u.firstName || u.user?.firstName} {u.lastName || u.user?.lastName}</td>
+            <td className="py-2 px-4">{u.email || u.user?.email}</td>
+            <td className="py-2 px-4">{u.phone || u.user?.phone}</td>
+            <td className="py-2 px-4">{new Date(u.createdAt || u.user?.createdAt).toLocaleDateString()}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 
-  const totalPages = Math.ceil(filtered.length / pageSize);
-  const paginated = filtered.slice((page - 1) * pageSize, page * pageSize);
+    const renderTableBuyers = (rows) => (
+    <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+      <thead className="bg-gray-100 text-left">
+        <tr>
+          <th className="py-2 px-4">Name</th>
+          <th className="py-2 px-4">Email</th>
+          <th className="py-2 px-4">Phone</th>
+          <th className="py-2 px-4">Date</th>
+          <th className="py-2 px-4">Total Orders</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((u, idx) => (
+          <tr key={idx} className="border-t">
+            <td className="py-2 px-4">{u.firstName || u.user?.firstName} {u.lastName || u.user?.lastName}</td>
+            <td className="py-2 px-4">{u.email || u.user?.email}</td>
+            <td className="py-2 px-4">{u.phone || u.user?.phone}</td>
+            <td className="py-2 px-4">{new Date(u.createdAt || u.user?.createdAt).toLocaleDateString()}</td>
+            <td className="py-2 px-4">{u.orderCount}</td>
+
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
 
   return (
-    <div className="p-4">
-      <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-        <div className="flex items-center gap-2 w-full md:w-auto">
-          <FiSearch className="text-gray-500" />
-          <input
-            type="text"
-            placeholder="Search customers"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="border px-3 py-1 rounded w-full md:w-64"
-          />
-        </div>
-        <CSVLink
-          data={filtered}
-          filename="customers.csv"
-          className="bg-blue-600 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-blue-700"
-        >
-          <FiDownload /> Download CSV
-        </CSVLink>
-      </div>
+    <div className="p-6">
+      <h1 className="text-2xl font-semibold mb-4">User Dashboard</h1>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full table-auto border rounded shadow bg-white">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="text-left p-2 border">ID</th>
-              <th className="text-left p-2 border">Name</th>
-              <th className="text-left p-2 border">Email</th>
-              <th className="text-left p-2 border">Orders</th>
-              <th className="text-left p-2 border">Total Spent</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginated.map((cust) => (
-              <tr key={cust.id} className="hover:bg-gray-50">
-                <td className="p-2 border">{cust.id}</td>
-                <td className="p-2 border">{cust.name}</td>
-                <td className="p-2 border">{cust.email}</td>
-                <td className="p-2 border">{cust.orders}</td>
-                <td className="p-2 border">{cust.totalSpent}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      <div className="mt-4 flex justify-center gap-2">
-        <button
-          disabled={page === 1}
-          onClick={() => setPage((prev) => prev - 1)}
-          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-        >
-          Prev
-        </button>
-        {[...Array(totalPages)].map((_, i) => (
+      <div className="flex space-x-4 mb-4">
+        {TABS.map((tab, index) => (
           <button
-            key={i}
-            className={`px-3 py-1 rounded ${
-              i + 1 === page ? 'bg-blue-600 text-white' : 'bg-gray-200'
-            }`}
-            onClick={() => setPage(i + 1)}
+            key={index}
+            onClick={() => { setActiveTab(index); setError(''); setPagination({ ...pagination, page: 1 }); }}
+            className={`px-4 py-2 rounded ${activeTab === index ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
           >
-            {i + 1}
+            {tab}
           </button>
         ))}
-        <button
-          disabled={page === totalPages}
-          onClick={() => setPage((prev) => prev + 1)}
-          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-        >
-          Next
-        </button>
       </div>
+
+      {loading && <div className="text-blue-500 mb-4">Loading...</div>}
+      {error && <div className="text-red-500 mb-4">{error}</div>}
+
+      {activeTab === 0 && (
+        <div className="space-y-4">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="User ID"
+              value={userQuery.userId}
+              onChange={(e) => setUserQuery({ ...userQuery, userId: e.target.value })}
+              className="border p-2 rounded w-full"
+            />
+            <input
+              type="text"
+              placeholder="Email"
+              value={userQuery.email}
+              onChange={(e) => setUserQuery({ ...userQuery, email: e.target.value })}
+              className="border p-2 rounded w-full"
+            />
+            <button onClick={fetchUser} className="bg-blue-600 text-white px-4 py-2 rounded">
+              Search
+            </button>
+          </div>
+
+          {userData && (
+            <div className="bg-white p-4 rounded shadow-md">
+              <p><strong>Name:</strong> {userData.firstName} {userData.lastName}</p>
+              <p><strong>Email:</strong> {userData.email}</p>
+              <p><strong>Phone:</strong> {userData.phone}</p>
+              <p><strong>Registered:</strong> {new Date(userData.createdAt).toLocaleDateString()}</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 1 && allUsers && renderTable(allUsers)}
+      {activeTab === 2 && frequentBuyers && renderTableBuyers(frequentBuyers)}
+
+      {(activeTab === 1 || activeTab === 2) && (
+        <div className="mt-4 flex justify-end gap-4">
+          <button
+            onClick={() => setPagination((p) => ({ ...p, page: Math.max(p.page - 1, 1) }))}
+            disabled={pagination.page === 1}
+            className="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400"
+          >
+            Prev
+          </button>
+          <button
+            onClick={() => setPagination((p) => ({ ...p, page: p.page + 1 }))}
+            className="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }
+
+export default UserDashboard;

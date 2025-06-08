@@ -24,15 +24,20 @@ export default function Sidebar() {
         <li>
           <Link to="/analysis" className="text-gray-700 hover:text-black block">Analatics</Link>
         </li>
+       
+        
         <li>
-          <Link to="/settings" className="text-gray-700 hover:text-black block">Settings</Link>
+          <Link to="/addproducts" className="text-gray-700 hover:text-black block">Add Products</Link>
+        </li>
+        <li>
+          <Link to="/messages" className="text-gray-700 hover:text-black block">Messages</Link>
         </li>
         <li>
           <Link to="/add-blogs" className="text-gray-700 hover:text-black block">Add Blogs</Link>
         </li>
-        <li>
-          <Link to="/addproducts" className="text-gray-700 hover:text-black block">Add Products</Link>
-        </li>
+         <li>
+          <Link to="/settings" className="text-gray-700 hover:text-black block">Settings</Link>
+      </li>
         <li className="text-gray-700 hover:text-black cursor-pointer">Users</li>
       </ul>
     </div>

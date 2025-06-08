@@ -2,11 +2,16 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import { FiMenu, FiX, FiChevronRight, FiChevronLeft, FiHome, FiShoppingBag, FiUsers, FiPackage, FiBarChart2, FiSettings, FiShoppingCart, FiFileText } from 'react-icons/fi';
+import { getUser } from '../utils/getUser';
 
 const Layout = () => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [user, setUser] = useState(null);
 
+  const userData= getUser();
+
+  console.log("userData",userData)
+ 
   useEffect(() => {
     const userData = localStorage.getItem('user');
     if (userData) {
@@ -15,15 +20,17 @@ const Layout = () => {
   }, []);
 
   const menuItems = [
-    { path: '/dashboard', icon: <FiHome />, label: 'Dashboard' },
-    { path: '/', icon: <FiShoppingCart />, label: 'Orders' },
+    // { path: '/dashboard', icon: <FiHome />, label: 'Dashboard' },
+    { path: '/', icon: <FiShoppingCart />, label: 'Dashboard' },
     { path: '/products', icon: <FiShoppingBag />, label: 'Products' },
     { path: '/customers', icon: <FiUsers />, label: 'Customers' },
-    { path: '/inventory', icon: <FiPackage />, label: 'Inventory' },
+    // { path: '/inventory', icon: <FiPackage />, label: 'Inventory' },
     { path: '/add-blogs', icon: <FiFileText />, label: 'Blogs' },
     { path: '/analysis', icon: <FiBarChart2 />, label: 'Analysis' },
-    { path: '/settings', icon: <FiSettings />, label: 'Settings' },
     { path: '/addproducts', icon:<FiPackage /> , label: 'Add Product' },
+    { path: '/messages', icon:<FiPackage /> , label: 'Messages' },
+    { path: '/settings', icon: <FiSettings />, label: 'Settings' },
+
   ];
 
   return (
@@ -81,8 +88,8 @@ const Layout = () => {
             {isExpanded && (
               <div className="ml-3 flex ">
               <div className="flex flex-col">
-                <p className="text-sm font-medium text-gray-700">{user?.name || 'User'}</p>
-                <p className="text-xs text-gray-500">{user?.email || 'user@example.com'}</p>
+                <p className="text-sm font-medium text-gray-700">{userData?.firstName || 'User'}</p>
+                <p className="text-xs text-gray-500">{userData?.email || 'user@example.com'}</p>
               </div>
                  <div className="ml-3 bg-red-400 text-white p-1 rounded-lg cursor-pointer  transition-colors">
                   <button

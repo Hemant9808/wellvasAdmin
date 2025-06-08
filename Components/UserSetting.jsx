@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../utils/axios';
+import { getUser } from '../utils/getUser';
 
 function AdminProfile() {
+  const userData= getUser();
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    userName: '',
-    email: '',
+    firstName:userData.firstName || '',
+    lastName:userData.lastName || '',
+    userName: userData.userName ||  '',
+    email:userData.email ||  '',
     phone: ''
   });
+    
+  
 
   const [message, setMessage] = useState({ type: '', content: '' });
   const [loading, setLoading] = useState(false);

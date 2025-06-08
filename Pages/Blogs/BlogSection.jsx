@@ -345,23 +345,23 @@ const BlogSection = () => {
 
 
                 <div className="  flex justify-between mt-4 ">
-                    <Link
+                    {/* <Link
                       to={`/blogs/${post._id}`}
                       className="text-blue-500 hover:underline"
                     >
                       Read More →
-                    </Link>
+                    </Link> */}
                
                       <div className=" flex gap-4">
                         <button
                           onClick={() => handleEdit(post)}
-                          className="text-green-500 hover:text-green-700"
+                          className="text-green-500 bg-green-200 p-2 rounded-lg hover:text-green-700"
                         >
                           Edit
                         </button>
                         <button
                           onClick={() => handleDelete(post._id)}
-                          className="text-red-500 hover:text-red-700"
+                          className="text-red-500 bg-red-200 p-2 rounded-lg hover:text-red-700"
                         >
                           Delete
                         </button>
