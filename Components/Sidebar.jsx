@@ -1,44 +1,65 @@
 // src/components/Sidebar.jsx
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen, toggleSidebar }) {
   return (
-    <div className="w-64 h-screen bg-white shadow-md p-4">
-      <h2 className="text-xl font-bold mb-6">Admin Panel</h2>
-      <ul className="space-y-4">
+    <div
+      className={`fixed top-0 left-0 h-full bg-white shadow-md z-50 transition-transform duration-300 ${
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      } w-64 md:translate-x-0 md:static md:block`}
+    >
+      <div className="flex items-center justify-between p-4 md:hidden">
+        <h2 className="text-xl font-bold">Wellvas Admin</h2>
+        <button onClick={toggleSidebar} className="text-gray-700 text-2xl">
+          &times;
+        </button>
+      </div>
+      <ul className="space-y-4 p-4">
         <li>
-          <Link to="/" className="text-gray-700 hover:text-black block">Dashboard</Link>
+          <Link to="/" className="text-gray-700 hover:text-black block">
+            Dashboard
+          </Link>
         </li>
         <li>
-          <Link to="/orders" className="text-gray-700 hover:text-black block">Orders</Link>
+          <Link to="/orders" className="text-gray-700 hover:text-black block">
+            Orders
+          </Link>
         </li>
         <li>
-          <Link to="/products" className="text-gray-700 hover:text-black block">Products</Link>
-        </li>
-        {/* <li>
-          <Link to="/customers" className="text-gray-700 hover:text-black block">Customers</Link>
-        </li> */}
-        <li>
-          <Link to="/inventory" className="text-gray-700 hover:text-black block">Inventory</Link>
+          <Link to="/products" className="text-gray-700 hover:text-black block">
+            Products
+          </Link>
         </li>
         <li>
-          <Link to="/analysis" className="text-gray-700 hover:text-black block">Analatics</Link>
-        </li>
-       
-        
-        <li>
-          <Link to="/addproducts" className="text-gray-700 hover:text-black block">Add Products</Link>
+          <Link to="/inventory" className="text-gray-700 hover:text-black block">
+            Inventory
+          </Link>
         </li>
         <li>
-          <Link to="/messages" className="text-gray-700 hover:text-black block">Messages</Link>
+          <Link to="/analysis" className="text-gray-700 hover:text-black block">
+            Analytics
+          </Link>
         </li>
         <li>
-          <Link to="/add-blogs" className="text-gray-700 hover:text-black block">Add Blogs</Link>
+          <Link to="/addproducts" className="text-gray-700 hover:text-black block">
+            Add Products
+          </Link>
         </li>
-         <li>
-          <Link to="/settings" className="text-gray-700 hover:text-black block">Settings</Link>
-      </li>
-        <li className="text-gray-700 hover:text-black cursor-pointer">Users</li>
+        <li>
+          <Link to="/messages" className="text-gray-700 hover:text-black block">
+            Messages
+          </Link>
+        </li>
+        <li>
+          <Link to="/add-blogs" className="text-gray-700 hover:text-black block">
+            Add Blogs
+          </Link>
+        </li>
+        <li>
+          <Link to="/settings" className="text-gray-700 hover:text-black block">
+            Settings
+          </Link>
+        </li>
       </ul>
     </div>
   );
