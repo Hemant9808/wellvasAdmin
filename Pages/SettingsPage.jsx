@@ -57,7 +57,7 @@ export default function SettingsPage() {
   const toggleFeatured = async (productId, currentStatus) => {
     try {
       setLoading(true);
-      await axiosInstance.post(`/product/mark-featured`, { productId });
+      await axiosInstance.post(`/product/mark-featured`, { productId ,currentStatus});
       toast.success("Product featured status updated");
       fetchProducts();
     } catch (error) {
@@ -70,9 +70,22 @@ export default function SettingsPage() {
   const toggleBestSelling = async (productId, currentStatus) => {
     try {
       setLoading(true);
-      await axiosInstance.post(`/product/mark-best-selling`, { productId });
-      toast.success("Product best-selling status updated");
-      fetchProducts();
+      const res = await axiosInstance.post(`/product/mark-best-selling`, { productId ,currentStatus});
+    console.log("res",res)
+      if( res.data.status === 400) {
+        alert(res.data.message);
+        return;
+      }
+      if( currentStatus){
+        toast.error("Product removed from best-selling");
+        fetchProducts();
+        return;
+      } else {
+        toast.success("Product marked as best-selling");
+        fetchProducts();
+        return;
+      }
+      
     } catch (error) {
       toast.error("Failed to update best-selling status");
     } finally {
@@ -218,14 +231,16 @@ export default function SettingsPage() {
                       <Button
                         onClick={() => toggleFeatured(product._id, product.isFeatured)}
                         variant={product.isFeatured ? "destructive" : "outline"}
-                        className="flex-1"
-                      >
+                        className={` flex-1 ${product.isFeatured ? "bg-red-500 text-white hover:bg-red-600" : "bg-blue-500 text-white hover:bg-blue-600"}`}
+                                      >
                         {product.isFeatured ? "Remove from Featured" : "Mark as Featured"}
                       </Button>
                       <Button
                         onClick={() => toggleBestSelling(product._id, product.isBestSelling)}
-                        variant={product.isBestSelling ? "destructive" : "outline"}
-                        className="flex-1"
+                        // variant={product.isBestSelling ? "destructive" : "outline"}
+                        variant="outline"
+                        className={` flex-1 ${product.isBestSelling ? "bg-red-500 text-white hover:bg-red-600" : "bg-blue-500 text-white hover:bg-blue-600"}`}
+                        
                       >
                         {product.isBestSelling ? "Remove from Best Selling" : "Mark as Best Selling"}
                       </Button>

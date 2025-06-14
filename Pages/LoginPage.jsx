@@ -13,6 +13,7 @@ const LoginPage = () => {
   });
   const [loading, setLoading] = useState(false);
   const token = localStorage.getItem("token")
+  const authStorage = localStorage.getItem("authStorage");
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -35,8 +36,7 @@ const LoginPage = () => {
         
         // Update auth store
         setUser(response.data.data.admin);
-        
-        toast.success('Login successful!');
+        hmh
         navigate('/'); // Redirect to dashboard
       }
     } catch (error) {
@@ -47,7 +47,7 @@ const LoginPage = () => {
     }
   };
   useEffect(()=>{
-    if(token){
+    if(token && authStorage){
         console.log("knsb")
         navigate('/');
       }

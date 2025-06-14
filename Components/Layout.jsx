@@ -1,12 +1,13 @@
 // src/components/Layout.jsx
 import React, { useState, useEffect } from 'react';
-import { Outlet, NavLink } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { FiMenu, FiX, FiChevronRight, FiChevronLeft, FiHome, FiShoppingBag, FiUsers, FiPackage, FiBarChart2, FiSettings, FiShoppingCart, FiFileText } from 'react-icons/fi';
 import { getUser } from '../utils/getUser';
 
 const Layout = () => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   const userData= getUser();
 
@@ -97,6 +98,7 @@ const Layout = () => {
                       localStorage.removeItem('authStorage');
                       localStorage.removeItem('token');
                       window.location.reload();
+                      navigate('/login', { replace: true });
                     }}
                     className=" cursor-pointer text-sm"
                   >
