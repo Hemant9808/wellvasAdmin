@@ -2,8 +2,8 @@
 
 import axios from 'axios';
 
-const baseURL ='http://localhost:4000';
-// const baseURL = 'https://wellvas-backend.onrender.com';
+// const baseURL ='http://localhost:4000';
+const baseURL = 'https://wellvas-backend.onrender.com';
 // const baseURL = import.meta.env.VITE_API_URL;
 
 const axiosInstance = axios.create({
