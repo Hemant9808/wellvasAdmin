@@ -572,7 +572,7 @@ function OrderDetails() {
                                                  <!-- Delivery Address -->
                          <div class="delivery-section" style="display: flex; justify-content: space-between;">
                              <div style="flex: 1;">
-                                 <h3 style="font-weight: bold; font-size: 16px; margin-bottom: 4px;">DELIVERY ADDRESS: ${order?.shippingAddress?.fullName || 'Customer Name'}</h3>
+                                 <h3 style="font-weight: bold; font-size: 16px; margin-bottom: 4px;">Customer Name: ${order?.user?.FirstName} ${order?.user?.lastName}</h3>
                                  <div class="address-block">
                                      <p>${order?.shippingAddress?.address || 'Address Line 1'}</p>
                                      <p>${order?.shippingAddress?.city || 'City'}, ${order?.shippingAddress?.postalCode || 'PIN'}</p>
@@ -775,9 +775,9 @@ function OrderDetails() {
                 {/* Delivery Address */}
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <div style={{ marginBottom: '20px' }}>
-                    <h3 style={{ fontWeight: 'bold', fontSize: '0.9rem', marginBottom: '8px' }}>DELIVERY ADDRESS: {order?.shippingAddress?.fullName || 'Customer Name'}</h3>
+                    <h3 style={{ fontWeight: 'bold', fontSize: '0.9rem', marginBottom: '8px' }}>Customer Name: {order?.user?.firstName} {order?.user?.lastName }</h3>
                     <div style={{ borderLeft: '4px solid #3b82f6',fontSize: '0.9rem', paddingLeft: '10px', marginTop: '5px' }}>
-                        <p>{order?.shippingAddress?.address || 'Address Line 1'}</p>
+                        <p>{order?.shippingAddress?.address || 'Address Line 1'}</p>    
                         <p>{order?.shippingAddress?.city || 'City'}, {order?.shippingAddress?.postalCode || 'PIN'}</p>
                         <p>{order?.shippingAddress?.state || 'State'}</p>
                        
@@ -924,8 +924,16 @@ function OrderDetails() {
 
                 <div>
                     <h3 style={{ fontSize: '20px', fontWeight: '500', marginTop: '24px', marginBottom: '8px' }}>User Info</h3>
+                    <p><strong>Name:</strong> {order?.user?.firstName} {order.user.lastName}</p>
+                    <p><strong>Email:</strong> {order?.user?.email}</p>
+
+                    <p><strong>Phone:</strong> {order?.user?.phone}</p>
                     <p><strong>User ID:</strong> {order?.user?._id}</p>
                     <p><strong>Email:</strong> {order?.user?.email}</p>
+                </div>
+                <div>
+                    <h3 style={{ fontSize: '20px', fontWeight: '500', marginTop: '24px', marginBottom: '8px' }}>Coupon Applied : {order?.couponCode || 'N/A'}</h3>
+                    
                 </div>
 
                 <div>

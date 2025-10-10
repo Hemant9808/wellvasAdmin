@@ -233,7 +233,7 @@ const OrdersPage = () => {
                       {order._id}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {order.user?.name || 'N/A'}
+                      {order.user?.firstName} {order.user?.lastName}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {new Date(order.createdAt).toLocaleDateString()}

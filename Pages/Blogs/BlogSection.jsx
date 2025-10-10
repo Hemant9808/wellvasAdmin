@@ -267,11 +267,12 @@ const BlogSection = () => {
                   <Editor
                     apiKey='1me8jbsjux1lek0xoq6018iujrx1jv9isuam7bu259kygrqt'
                     init={{
-                      plugins: [
+                      // plugins: [
                         // 'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
                         // 'checklist', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'editimage', 'advtemplate', 'mentions', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown','importword', 'exportword', 'exportpdf'
-                      ],
-                      toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat | undo redo | bold italic | alignleft aligncenter alignright | image link media | code',
+                      // ],
+                      // text color in toolbar
+                      toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat | undo redo | bold italic | alignleft aligncenter alignright | image link media | code | forecolor backcolor',
                       images_upload_handler: async (blobInfo, success, failure) => {
                         const file = blobInfo.blob();
                         const imageUrl = await handleFileUpload(file);
