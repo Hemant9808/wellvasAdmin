@@ -1,16 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   FiSearch,
   FiDownload,
   FiEdit2,
   FiTrash2,
-  FiPlus,
 } from "react-icons/fi";
 import { CSVLink } from "react-csv";
 import axiosInstance from "../utils/axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import axios from "axios";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
@@ -19,70 +17,57 @@ export default function ProductsPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [showAddCategory, setShowAddCategory] = useState(true);
   const [newCategory, setNewCategory] = useState("");
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [stock, setStock] = useState(0);
-    const [selectedProductId, SetselectedProductId] = useState("");
+  const [selectedProductId, SetselectedProductId] = useState("");
   const pageSize = 10;
 
-  useEffect(() => {
-    fetchCategories();
-    fetchProducts();
-  }, []);
-
-  const fetchCategories = async () => {
+  // 🧠 useCallback to prevent recreating functions on every render
+  const fetchCategories = useCallback(async () => {
     try {
       const res = await axiosInstance.get("/product/getAllCategories");
-      setCategories(res.data);
-    } catch (err) {
+      setCategories(res.data || []);
+    } catch {
       toast.error("Failed to fetch categories");
     }
-  };
+  }, []);
 
-   const updateStock = async () => {
-      console.log("selectedProductId inviwne",selectedProductId,stock)
-
-    try {
-      const response = await axiosInstance.post(`/product/updateStock`,
-         {
-        id: selectedProductId,
-        stock: stock,
-      }
-    );
-      toast.success("Stock updated successfully");
-      setSelectedMessage(null);
-      fetchProducts(selectedCategory);
-    } catch (error) {
-      toast.error("Failed to update stock");
-    }
-
-  };
-
-
-  const fetchProducts = async (category = "") => {
+  const fetchProducts = useCallback(async (category = "") => {
     setLoading(true);
     try {
-      let res;
-      if (category) {
-        res = await axiosInstance.get(
-          `/product/getProductByCategories?category=${encodeURIComponent(
-            category
-          )}`
-        );
-        setProducts(res.data);
-      } else {
-        res = await axiosInstance.get("/product/getAllProducts");
-        setProducts(res.data);
-      }
-    } catch (err) {
+      const endpoint = category
+        ? `/product/getProductByCategories?category=${encodeURIComponent(category)}`
+        : "/product/getAllProducts";
+      const res = await axiosInstance.get(endpoint);
+      setProducts(res.data || []);
+    } catch {
       toast.error("Failed to fetch products");
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const handleAddCategory = async () => {
+  useEffect(() => {
+    // 🧩 parallel fetching to save time
+    Promise.all([fetchCategories(), fetchProducts()]).catch(() => {});
+  }, [fetchCategories, fetchProducts]);
+
+  const updateStock = useCallback(async () => {
+    try {
+      await axiosInstance.post(`/product/updateStock`, {
+        id: selectedProductId,
+        stock: stock,
+      });
+      toast.success("Stock updated successfully");
+      setSelectedMessage(null);
+      fetchProducts(selectedCategory);
+    } catch {
+      toast.error("Failed to update stock");
+    }
+  }, [selectedProductId, stock, selectedCategory, fetchProducts]);
+
+  const handleAddCategory = useCallback(async () => {
     if (!newCategory.trim()) {
       toast.error("Category name is required");
       return;
@@ -91,56 +76,45 @@ export default function ProductsPage() {
       await axiosInstance.post("/product/addCategory", { name: newCategory });
       toast.success("Category added successfully");
       setNewCategory("");
-      setShowAddCategory(false);
       fetchCategories();
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to add category");
     }
-  };
+  }, [newCategory, fetchCategories]);
 
-  const handleDeleteCategory = async (categoryId) => {
-    if (!window.confirm("Are you sure you want to delete this category?"))
-      return;
-    try {
-      await axiosInstance.delete(`/product/deleteCategory/${categoryId}`);
-      toast.success("Category deleted successfully");
-      fetchCategories();
-      if (selectedCategory === categoryId) {
-        setSelectedCategory("");
-        fetchProducts();
+  const handleDelete = useCallback(
+    async (id) => {
+      if (!window.confirm("Are you sure you want to delete this product?")) return;
+      try {
+        await axiosInstance.delete(`/product/deleteProduct/${id}`);
+        toast.success("Product deleted");
+        fetchProducts(selectedCategory);
+      } catch {
+        toast.error("Failed to delete product");
       }
-    } catch (err) {
-      toast.error("Failed to delete category");
-    }
-  };
-
-  // Search filter
-  const filtered = products.filter((product) =>
-    product.name.toLowerCase().includes(search.toLowerCase())
+    },
+    [selectedCategory, fetchProducts]
   );
 
-  const totalPages = Math.ceil(filtered.length / pageSize);
-  const paginated = filtered.slice((page - 1) * pageSize, page * pageSize);
+  // 🧮 useMemo to avoid recalculating filtered and paginated arrays
+  const filtered = useMemo(
+    () =>
+      products.filter((product) =>
+        product.name?.toLowerCase().includes(search.toLowerCase())
+      ),
+    [products, search]
+  );
 
-  // Edit and Delete handlers
-  const handleEdit = (id) => {
-    toast.info("Edit product: " + id);
-  };
+  const totalPages = useMemo(
+    () => Math.ceil(filtered.length / pageSize),
+    [filtered.length, pageSize]
+  );
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this product?"))
-      return;
-    try {
-      await axiosInstance.delete(`/product/deleteProduct/${id}`);
-      toast.success("Product deleted");
-      fetchProducts(selectedCategory);
-    } catch (err) {
-      toast.error("Failed to delete product");
-    }
-  };
-  console.log("selectedProductId",selectedProductId,stock)
+  const paginated = useMemo(
+    () => filtered.slice((page - 1) * pageSize, page * pageSize),
+    [filtered, page, pageSize]
+  );
 
- 
   return (
     <div className="p-4">
       {/* Categories Section */}
@@ -161,22 +135,13 @@ export default function ProductsPage() {
             >
               <div className="flex justify-between items-center">
                 <h3 className="font-medium">{category.name}</h3>
-                {/* <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteCategory(category._id);
-                  }}
-                  className="text-red-600 hover:text-red-800"
-                >
-                  <FiTrash2 />
-                </button> */}
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Products Section */}
+      {/* Search + CSV */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
         <div className="flex items-center gap-2 w-full md:w-auto">
           <FiSearch className="text-gray-500" />
@@ -197,6 +162,7 @@ export default function ProductsPage() {
         </CSVLink>
       </div>
 
+      {/* Products Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full table-auto border rounded shadow bg-white">
           <thead className="bg-gray-100">
@@ -226,10 +192,11 @@ export default function ProductsPage() {
               paginated.map((product) => (
                 <tr key={product._id} className="hover:bg-gray-50">
                   <td className="p-2 border">
-                    {product.images && product.images.length > 0 ? (
+                    {product.images?.[0]?.url ? (
                       <img
                         src={product.images[0].url}
                         alt={product.name}
+                        loading="lazy"
                         className="w-14 h-14 object-cover rounded"
                       />
                     ) : (
@@ -245,25 +212,23 @@ export default function ProductsPage() {
                       setStock(product.stock);
                       SetselectedProductId(product._id);
                     }}
-                    className="p-2 border  cursor-pointer"
+                    className="p-2 border cursor-pointer"
                   >
-                    <p className=" text-blue-400 cursor-pointer">
-                      {product.stock}
-                    </p>
+                    <p className="text-blue-400">{product.stock}</p>
                   </td>
                   <td className="p-2 border">
                     <div className="flex gap-2">
                       <button
-                        onClick={() => handleEdit(product._id)}
+                        onClick={() =>
+                          toast.info("Edit product: " + product._id)
+                        }
                         className="text-blue-600 hover:text-blue-800"
-                        title="Edit"
                       >
                         <FiEdit2 />
                       </button>
                       <button
                         onClick={() => handleDelete(product._id)}
                         className="text-red-600 hover:text-red-800"
-                        title="Delete"
                       >
                         <FiTrash2 />
                       </button>
@@ -280,7 +245,7 @@ export default function ProductsPage() {
       <div className="mt-4 flex justify-center gap-2">
         <button
           disabled={page === 1}
-          onClick={() => setPage((prev) => prev - 1)}
+          onClick={() => setPage((p) => p - 1)}
           className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
         >
           Prev
@@ -298,15 +263,16 @@ export default function ProductsPage() {
         ))}
         <button
           disabled={page === totalPages}
-          onClick={() => setPage((prev) => prev + 1)}
+          onClick={() => setPage((p) => p + 1)}
           className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
         >
           Next
         </button>
       </div>
 
+      {/* Stock Modal */}
       {selectedMessage && (
-        <div className="fixed inset-0 shadow-lg bg-[rgba(0,0,0,0.4)] flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-[rgba(0,0,0,0.4)] flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded shadow-md max-w-lg w-full relative">
             <button
               className="absolute top-2 right-3 text-gray-500 hover:text-black text-xl"
@@ -315,32 +281,32 @@ export default function ProductsPage() {
               &times;
             </button>
             <h3 className="text-xl font-semibold mb-2">Manage Stocks</h3>
-            <div className=" px-[5rem] flex items-center gap-2 mb-4 justify-between">
-            <button
-              onClick={() => setStock(stock + 1)}
-              className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600"
-            >
-              +1
-            </button>
-            <input
-              value={stock}
-              onChange={(e) => setStock(e.target.value)}
-              type="number"
-              className="border"
-            ></input>
-            <button
-              onClick={() => setStock(stock - 1)}
-              className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-            >
-              -1
-            </button>
+            <div className="px-[5rem] flex items-center gap-2 mb-4 justify-between">
+              <button
+                onClick={() => setStock(stock + 1)}
+                className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+              >
+                +1
+              </button>
+              <input
+                value={stock}
+                onChange={(e) => setStock(Number(e.target.value))}
+                type="number"
+                className="border text-center w-20"
+              />
+              <button
+                onClick={() => setStock(stock - 1)}
+                className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+              >
+                -1
+              </button>
             </div>
 
             <button
-              onClick={() => updateStock()}
-              className="px-2 py-1   items-right cursor-pointer bg-green-500 text-white rounded "
+              onClick={updateStock}
+              className="px-4 py-2 bg-green-500 text-white rounded"
             >
-              submit
+              Submit
             </button>
           </div>
         </div>

@@ -6,10 +6,10 @@ export const courierSellerInfo = {
         cpd: "12/08/2025"
     },
     seller: {
-        name: "NS ENTERPRISE",
-        address: "Lichubogam mono, GT Road Near Kanak Nursing Home",
-        city: "Bundel, Hooghly, Chmurah+",
-        state: "HOOGHLY - 712101",
-        gstinNo: "19ATTP02464K126"
+        name: "Wellvas Helthcare",
+        address: "E-46/3, Mohan Baba Nagar, Nearby - S K Payal Public School",
+        city: "Badarpur",
+        state: "New Delhi 110044",
+        gstinNo: "07JVTPK9524E1ZX"
     }
 };
