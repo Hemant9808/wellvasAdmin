@@ -9,6 +9,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+//Lauda
+
 const data = [
   { name: "Mon", revenue: 400 },
   { name: "Tue", revenue: 700 },
