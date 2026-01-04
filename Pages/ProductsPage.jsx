@@ -6,17 +6,20 @@ import {
   FiTrash2,
 } from "react-icons/fi";
 import { CSVLink } from "react-csv";
+import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function ProductsPage() {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [newCategory, setNewCategory] = useState("");
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [stock, setStock] = useState(0);
@@ -49,9 +52,13 @@ export default function ProductsPage() {
   }, []);
 
   useEffect(() => {
-    // 🧩 parallel fetching to save time
-    Promise.all([fetchCategories(), fetchProducts()]).catch(() => {});
-  }, [fetchCategories, fetchProducts]);
+    // 🧩 parallel fetching to save time - only on mount
+    setInitialLoading(true);
+    Promise.all([fetchCategories(), fetchProducts()])
+      .catch(() => { })
+      .finally(() => setInitialLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on component mount
 
   const updateStock = useCallback(async () => {
     try {
@@ -119,26 +126,35 @@ export default function ProductsPage() {
     <div className="p-4">
       {/* Categories Section */}
       <div className="mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {categories.map((category) => (
-            <div
-              key={category._id}
-              className={`p-4 border rounded shadow-sm cursor-pointer transition-all ${
-                selectedCategory === category._id
+        {initialLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {[...Array(4)].map((_, idx) => (
+              <div key={idx} className="p-4 border rounded shadow-sm animate-pulse bg-white">
+                <div className="h-6 bg-gray-200 rounded"></div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {categories.map((category) => (
+              <div
+                key={category._id}
+                className={`p-4 border rounded shadow-sm cursor-pointer transition-all ${selectedCategory === category._id
                   ? "bg-green-50 border-green-500"
                   : "bg-white hover:shadow-md"
-              }`}
-              onClick={() => {
-                setSelectedCategory(category._id);
-                fetchProducts(category.name);
-              }}
-            >
-              <div className="flex justify-between items-center">
-                <h3 className="font-medium">{category.name}</h3>
+                  }`}
+                onClick={() => {
+                  setSelectedCategory(category._id);
+                  fetchProducts(category.name);
+                }}
+              >
+                <div className="flex justify-between items-center">
+                  <h3 className="font-medium">{category.name}</h3>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Search + CSV */}
@@ -176,12 +192,33 @@ export default function ProductsPage() {
             </tr>
           </thead>
           <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={6} className="text-center p-4">
-                  Loading...
-                </td>
-              </tr>
+            {loading || initialLoading ? (
+              // Skeleton loader
+              [...Array(pageSize)].map((_, idx) => (
+                <tr key={idx} className="animate-pulse">
+                  <td className="p-2 border">
+                    <div className="w-14 h-14 bg-gray-200 rounded"></div>
+                  </td>
+                  <td className="p-2 border">
+                    <div className="h-4 bg-gray-200 rounded w-32"></div>
+                  </td>
+                  <td className="p-2 border">
+                    <div className="h-4 bg-gray-200 rounded w-20"></div>
+                  </td>
+                  <td className="p-2 border">
+                    <div className="h-4 bg-gray-200 rounded w-16"></div>
+                  </td>
+                  <td className="p-2 border">
+                    <div className="h-4 bg-gray-200 rounded w-12"></div>
+                  </td>
+                  <td className="p-2 border">
+                    <div className="flex gap-2">
+                      <div className="w-8 h-8 bg-gray-200 rounded"></div>
+                      <div className="w-8 h-8 bg-gray-200 rounded"></div>
+                    </div>
+                  </td>
+                </tr>
+              ))
             ) : paginated.length === 0 ? (
               <tr>
                 <td colSpan={6} className="text-center p-4">
@@ -198,9 +235,15 @@ export default function ProductsPage() {
                         alt={product.name}
                         loading="lazy"
                         className="w-14 h-14 object-cover rounded"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="56" height="56"%3E%3Crect fill="%23f0f0f0" width="56" height="56"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23999" font-size="10"%3ENo Image%3C/text%3E%3C/svg%3E';
+                        }}
                       />
                     ) : (
-                      <span className="text-gray-400">No Image</span>
+                      <div className="w-14 h-14 bg-gray-200 rounded flex items-center justify-center">
+                        <span className="text-gray-400 text-xs">No Image</span>
+                      </div>
                     )}
                   </td>
                   <td className="p-2 border">{product.name}</td>
@@ -219,16 +262,16 @@ export default function ProductsPage() {
                   <td className="p-2 border">
                     <div className="flex gap-2">
                       <button
-                        onClick={() =>
-                          toast.info("Edit product: " + product._id)
-                        }
+                        onClick={() => navigate(`/addproducts/${product._id}`)}
                         className="text-blue-600 hover:text-blue-800"
+                        title="Edit product"
                       >
                         <FiEdit2 />
                       </button>
                       <button
                         onClick={() => handleDelete(product._id)}
                         className="text-red-600 hover:text-red-800"
+                        title="Delete product"
                       >
                         <FiTrash2 />
                       </button>
@@ -253,9 +296,8 @@ export default function ProductsPage() {
         {[...Array(totalPages)].map((_, i) => (
           <button
             key={i}
-            className={`px-3 py-1 rounded ${
-              i + 1 === page ? "bg-green-600 text-white" : "bg-gray-200"
-            }`}
+            className={`px-3 py-1 rounded ${i + 1 === page ? "bg-green-600 text-white" : "bg-gray-200"
+              }`}
             onClick={() => setPage(i + 1)}
           >
             {i + 1}

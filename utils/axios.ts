@@ -2,8 +2,8 @@
 
 import axios from 'axios';
 
-// const baseURL ='http://localhost:4000';
-const baseURL = 'https://wellvas.in';
+const baseURL = 'http://localhost:4000'; // Local backend for testing
+// const baseURL = 'https://wellvas.in'; // Production backend
 // const baseURL = import.meta.env.VITE_API_URL;
 
 const axiosInstance = axios.create({
@@ -18,7 +18,7 @@ axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     config.headers.Authorization = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZTE1NzFmZWM4M2VlM2E4OGJjNzI4YSIsImlhdCI6MTcyNjQxMzc1OX0.QH1quEr3Hakn0Ku4h7GSLbAlyrr1tj3QkEeeH9OooC0`;
-   
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

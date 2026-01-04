@@ -28,12 +28,12 @@ const LoginPage = () => {
 
     try {
       const response = await axiosInstance.post('/auth/adminLogin', formData);
-      
+
       if (response.data.status === 'success') {
         // Store token in localStorage
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('authStorage', JSON.stringify(response.data.data.admin));
-        
+
         // Update auth store
         setUser(response.data.data.admin);
         hmh
@@ -46,14 +46,14 @@ const LoginPage = () => {
       setLoading(false);
     }
   };
-  useEffect(()=>{
-    if(token && authStorage){
-        console.log("knsb")
-        navigate('/');
-      }
-  },[token])
+  useEffect(() => {
+    if (token && authStorage) {
+      console.log("knsb")
+      navigate('/');
+    }
+  }, [token])
 
- 
+
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -106,9 +106,8 @@ const LoginPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
-                loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
-              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
+                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
             >
               {loading ? (
                 <span className="flex items-center">

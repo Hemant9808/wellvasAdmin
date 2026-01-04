@@ -39,6 +39,8 @@ const Layout = () => {
     // { path: '/analysis', icon: <FiBarChart2 />, label: 'Analysis' },
     { path: "/addproducts", icon: <FiPackage />, label: "Add Product" },
     { path: "/messages", icon: <FiPackage />, label: "Messages" },
+    { path: "/reviews", icon: <FiPackage />, label: "Reviews" },
+    { path: "/coupons", icon: <FiPackage />, label: "Coupons" },
     { path: "/settings", icon: <FiSettings />, label: "Settings" },
   ];
 
@@ -71,10 +73,9 @@ const Layout = () => {
               <NavLink
                 to={item.path}
                 className={({ isActive }) =>
-                  `flex items-center p-3 rounded-lg transition-colors ${
-                    isActive
-                      ? "bg-blue-50 text-blue-600"
-                      : "text-gray-600 hover:bg-gray-100"
+                  `flex items-center p-3 rounded-lg transition-colors ${isActive
+                    ? "bg-blue-50 text-blue-600"
+                    : "text-gray-600 hover:bg-gray-100"
                   }`
                 }
                 onClick={() => setIsMobileOpen(false)}
@@ -129,9 +130,8 @@ const Layout = () => {
     <div className="flex h-screen overflow-hidden bg-gray-100">
       {/* Mobile Sidebar */}
       <div
-        className={`fixed top-0 left-0 z-50 h-full bg-white shadow-lg transition-transform duration-300 w-64 md:hidden ${
-          isMobileOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed top-0 left-0 z-50 h-full bg-white shadow-lg transition-transform duration-300 w-64 md:hidden ${isMobileOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         <SidebarContent />
       </div>
@@ -146,9 +146,8 @@ const Layout = () => {
 
       {/* Desktop Sidebar */}
       <div
-        className={`hidden md:flex flex-col bg-white shadow-lg transition-all duration-300 ${
-          isExpanded ? "w-64" : "w-20"
-        }`}
+        className={`hidden md:flex flex-col bg-white shadow-lg transition-all duration-300 ${isExpanded ? "w-64" : "w-20"
+          }`}
       >
         <SidebarContent />
       </div>

@@ -1,12 +1,16 @@
 // src/pages/AddProduct.jsx
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import { useParams, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "../utils/axios";
 import { FiPlus, FiX, FiCheck, FiEdit2, FiTrash2 } from "react-icons/fi";
 
 export default function AddProduct() {
+  const { productId } = useParams();
+  const navigate = useNavigate();
+  const [isEditMode, setIsEditMode] = useState(false);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [subcategories, setSubcategories] = useState([]);
@@ -31,7 +35,13 @@ export default function AddProduct() {
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+
+    // Check if we're in edit mode (productId exists in URL)
+    if (productId) {
+      setIsEditMode(true);
+      fetchProductDetails(productId);
+    }
+  }, [productId]);
 
   const fetchCategories = async () => {
     try {
@@ -39,6 +49,36 @@ export default function AddProduct() {
       setCategories(response.data);
     } catch (error) {
       toast.error("Failed to fetch categories");
+    }
+  };
+
+  // Fetch product details when editing
+  const fetchProductDetails = async (id) => {
+    try {
+      setLoading(true);
+      const response = await axiosInstance.get(`/product/getProductById/${id}`);
+      const product = response.data;
+
+      // Pre-populate form
+      setFormData({
+        name: product.name || "",
+        description: product.description || "",
+        price: product.price || "",
+        discountPrice: product.discountPrice || "",
+        brand: product.brand || "",
+        manufacturer: product.manufacturer || "",
+        stock: product.stock || "",
+      });
+
+      setUploadedImages(product.images || []);
+      setSelectedCategory(product.category?.[0] || "");
+      setSelectedSubcategories(product.subcategories || []);
+      setSubcategories(product.subcategories || []);
+    } catch (error) {
+      toast.error("Failed to fetch product details");
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -60,9 +100,9 @@ export default function AddProduct() {
 
   const handleEditCategory = async (categoryId, newName) => {
     try {
-      await axiosInstance.post("/product/addOrUpdateCategory", { 
+      await axiosInstance.post("/product/addOrUpdateCategory", {
         _id: categoryId,
-        name: newName 
+        name: newName
       });
       toast.success("Category updated successfully");
       setEditingCategory(null);
@@ -159,10 +199,7 @@ export default function AddProduct() {
       toast.error("Please upload at least one image");
       return;
     }
-    // if (selectedSubcategories.length === 0) {
-    //   toast.error("Please select or add at least one subcategory");
-    //   return;
-    // }
+
     setLoading(true);
     try {
       const payload = {
@@ -171,25 +208,40 @@ export default function AddProduct() {
         category: [selectedCategory],
         subcategories: selectedSubcategories,
       };
+
+      // If editing, include the product _id in the payload
+      if (isEditMode) {
+        payload._id = productId;
+      }
+
+      // Use the same endpoint for both create and update
       const res = await axiosInstance.post("/product/addProducts", payload);
-      if (res.data.success) {
-        toast.success("Product added successfully");
-        setFormData({
-          name: "",
-          description: "",
-          price: "",
-          discountPrice: "",
-          brand: "",
-          manufacturer: "",
-          stock: "",
-        });
-        setUploadedImages([]);
-        setSelectedSubcategories([]);
-        setSubcategories([]);
-        setSelectedCategory("");
+
+      if (isEditMode) {
+        toast.success("Product updated successfully");
+        // Navigate back to products page after update
+        setTimeout(() => navigate("/products"), 1500);
+      } else {
+        if (res.data.success) {
+          toast.success("Product added successfully");
+          // Reset form only for new products
+          setFormData({
+            name: "",
+            description: "",
+            price: "",
+            discountPrice: "",
+            brand: "",
+            manufacturer: "",
+            stock: "",
+          });
+          setUploadedImages([]);
+          setSelectedSubcategories([]);
+          setSubcategories([]);
+          setSelectedCategory("");
+        }
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to add product");
+      toast.error(err.response?.data?.message || `Failed to ${isEditMode ? "update" : "add"} product`);
     } finally {
       setLoading(false);
     }
@@ -202,8 +254,10 @@ export default function AddProduct() {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto bg-white shadow rounded-lg p-6">
-        <h2 className="text-2xl font-bold text-center mb-6">Create New Product</h2>
-        
+        <h2 className="text-2xl font-bold text-center mb-6">
+          {isEditMode ? "Edit Product" : "Create New Product"}
+        </h2>
+
         {/* Category Selection Section */}
         {!selectedCategory ? (
           <div className="mb-8">
@@ -246,18 +300,16 @@ export default function AddProduct() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {categories.map((category) => (
                 <div
-                onClick={() => handleCategorySelect(category._id)}
+                  onClick={() => handleCategorySelect(category._id)}
                   key={category._id}
-                  className={`p-6 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-lg ${
-                    selectedCategory === category._id
-                      ? "bg-green-50 border-green-500 shadow-md"
-                      : "bg-white hover:border-green-300"
-                  }`}
+                  className={`p-6 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-lg ${selectedCategory === category._id
+                    ? "bg-green-50 border-green-500 shadow-md"
+                    : "bg-white hover:border-green-300"
+                    }`}
                 >
                   <div className="flex flex-col items-center text-center">
-                    <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-3 ${
-                      selectedCategory === category._id ? "bg-green-100" : "bg-gray-100"
-                    }`}>
+                    <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-3 ${selectedCategory === category._id ? "bg-green-100" : "bg-gray-100"
+                      }`}>
                       <span className="text-2xl">📦</span>
                     </div>
                     {editingCategory === category._id ? (
@@ -280,10 +332,10 @@ export default function AddProduct() {
                         </button>
                       </div>
                     ) : (
-                      <div 
-                      
+                      <div
+
                       >
-                        <h4 
+                        <h4
                           className="font-medium text-lg"
                           onClick={() => handleCategorySelect(category._id)}
                         >
@@ -497,7 +549,7 @@ export default function AddProduct() {
                 <button
                   type="button"
                   className="border border-gray-400 text-gray-700 px-8 py-2 rounded-full hover:bg-gray-100"
-                  onClick={() => window.location.reload()}
+                  onClick={() => isEditMode ? navigate("/products") : window.location.reload()}
                 >
                   Cancel
                 </button>
@@ -506,7 +558,10 @@ export default function AddProduct() {
                   disabled={loading}
                   className="bg-black text-white px-8 py-2 rounded-full hover:bg-gray-900 disabled:bg-gray-400"
                 >
-                  {loading ? "Creating..." : "Create Product"}
+                  {loading
+                    ? (isEditMode ? "Updating..." : "Creating...")
+                    : (isEditMode ? "Update Product" : "Create Product")
+                  }
                 </button>
               </div>
             </div>

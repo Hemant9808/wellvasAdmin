@@ -150,12 +150,12 @@ const OrdersPage = () => {
           </div>
 
           {/* Sales Statistics */}
-          
+
 
         </div>
 
         <div className='flex justify-between gap-3 mb-4 flex-wrap ' >
-        <div className="bg-gradient-to-r w-[20rem] from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 transform hover:scale-105 transition-transform">
+          <div className="bg-gradient-to-r w-[20rem] from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 transform hover:scale-105 transition-transform">
             <div className="flex items-center">
               <div className="p-3 rounded-full bg-white text-blue-600">
                 <FiDollarSign className="w-6 h-6" />
@@ -191,7 +191,7 @@ const OrdersPage = () => {
             </div>
           </div>
         </div>
-        
+
         {/* Orders Table */}
         <div className="bg-white shadow-lg rounded-lg overflow-hidden">
           <div className="overflow-x-auto">
@@ -225,11 +225,11 @@ const OrdersPage = () => {
                 {orders.map((order) => (
                   <tr key={order._id} className="hover:bg-gray-50 transition-colors">
                     <td
-                    onClick={() => {
-                      // Navigate to order details page
-                      window.location.href = `/orders/${order._id}`;
-                    }}
-                     className="px-6 py-4 cursor-pointer whitespace-nowrap text-sm text-[#3c65e1]">
+                      onClick={() => {
+                        // Navigate to order details page
+                        window.location.href = `/orders/${order._id}`;
+                      }}
+                      className="px-6 py-4 cursor-pointer whitespace-nowrap text-sm text-[#3c65e1]">
                       {order._id}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -247,11 +247,10 @@ const OrdersPage = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        order.paymentResult?.paymentStatus === 'paid' 
-                          ? 'bg-green-100 text-green-800' 
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${order.paymentResult?.paymentStatus === 'paid'
+                          ? 'bg-green-100 text-green-800'
                           : 'bg-red-100 text-red-800'
-                      }`}>
+                        }`}>
                         {order.paymentResult?.paymentStatus || 'Not Paid'}
                       </span>
                     </td>

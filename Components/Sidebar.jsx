@@ -4,9 +4,8 @@ import { Link } from "react-router-dom";
 export default function Sidebar({ isOpen, toggleSidebar }) {
   return (
     <div
-      className={`fixed top-0 left-0 h-full bg-white shadow-md z-50 transition-transform duration-300 ${
-        isOpen ? "translate-x-0" : "-translate-x-full"
-      } w-64 md:translate-x-0 md:static md:block`}
+      className={`fixed top-0 left-0 h-full bg-white shadow-md z-50 transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"
+        } w-64 md:translate-x-0 md:static md:block`}
     >
       <div className="flex items-center justify-between p-4 md:hidden">
         <h2 className="text-xl font-bold">Wellvas Admin</h2>
@@ -48,6 +47,11 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
         <li>
           <Link to="/messages" className="text-gray-700 hover:text-black block">
             Messages
+          </Link>
+        </li>
+        <li>
+          <Link to="/reviews" className="text-gray-700 hover:text-black block">
+            Reviews
           </Link>
         </li>
         <li>

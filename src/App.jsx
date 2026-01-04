@@ -23,11 +23,13 @@ import useAuthStore from '../utils/authStore';
 import { useAuthMiddleware } from '../middleware';
 import OrderDetails from '../Pages/OrderDetails';
 import Messages from '../Pages/Messages';
+import Reviews from './pages/Reviews';
+import Coupons from './pages/Coupons';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuthStore();
-  
+
   // if (!user) {
   //   return <Navigate to="/login" replace />;
   // }
@@ -38,7 +40,7 @@ const ProtectedRoute = ({ children }) => {
 // Root component that includes the auth middleware
 const Root = () => {
   useAuthMiddleware();
-  
+
   return <Layout />;
 };
 
@@ -51,7 +53,7 @@ const router = createBrowserRouter([
     path: '/',
     element: (
       // <ProtectedRoute>
-        <Root />
+      <Root />
       // </ProtectedRoute>
     ),
     children: [
@@ -65,9 +67,11 @@ const router = createBrowserRouter([
       // { path: 'addproducts', element: <AddProduct /> },
       // { path: 'add-blogs', element: <AddBlog /> },
       { path: 'add-blogs', element: <BlogSection /> },
-      { path: 'addproducts', element: <AddProduct /> },
+      { path: 'addproducts/:productId?', element: <AddProduct /> },
       { path: 'orders/:id', element: <OrderDetails /> },
       { path: 'messages', element: <Messages /> },
+      { path: 'reviews', element: <Reviews /> },
+      { path: 'coupons', element: <Coupons /> },
       // { path: 'messages/:id', element: <singleMessage /> },
     ],
   },
