@@ -163,7 +163,7 @@ const Layout = () => {
         </div>
 
         {/* Outlet renders routed content */}
-        <div className="flex-1 overflow-auto p-4">
+        <div style={{ scrollBehavior: "smooth" }} className="flex-1 overflow-scroll p-4">
           <Outlet />
         </div>
       </div>

@@ -94,7 +94,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="p-4 max-w-6xl mx-auto">
+    <div className="p-4 max-w-6xl overflow-hidden mx-auto">
       <h2 className="text-2xl font-bold mb-6">Settings</h2>
 
       {/* Tab Navigation */}
@@ -139,7 +139,7 @@ export default function SettingsPage() {
 
       {/* Product Settings */}
       {activeTab === 'product' && (
-        <div className="space-y-6">
+        <div className="space-y-6 pb-10">
           {/* Statistics Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card className="p-4 bg-white">
