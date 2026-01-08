@@ -11,6 +11,9 @@ const dummyInventory = [
   { id: 6, name: 'Wellness Capsules', stock: 100 },
 ];
 
+
+
+
 export default function InventoryPage() {
   const [inventory, setInventory] = useState(dummyInventory);
   const [search, setSearch] = useState('');
