@@ -22,8 +22,8 @@ const Reviews = () => {
         pages: 1,
         total: 0
     });
-    // const API_BASE = 'http://localhost:4000'; // For local testing
-    const API_BASE = 'https://ayucan.in'; // Production backend URL
+    const API_BASE = 'http://localhost:4000'; // For local testing
+    // const API_BASE = 'https://ayucan.in'; // Production backend URL
 
     useEffect(() => {
         fetchReviews();
