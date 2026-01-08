@@ -25,6 +25,7 @@ import OrderDetails from '../Pages/OrderDetails';
 import Messages from '../Pages/Messages';
 import Reviews from './pages/Reviews';
 import Coupons from './pages/Coupons';
+import InvoiceGenerator from '../Pages/InvoiceGenerator';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -72,6 +73,7 @@ const router = createBrowserRouter([
       { path: 'messages', element: <Messages /> },
       { path: 'reviews', element: <Reviews /> },
       { path: 'coupons', element: <Coupons /> },
+      { path: 'generate-invoice', element: <InvoiceGenerator /> },
       // { path: 'messages/:id', element: <singleMessage /> },
     ],
   },

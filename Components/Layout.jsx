@@ -42,6 +42,7 @@ const Layout = () => {
     { path: "/reviews", icon: <FiPackage />, label: "Reviews" },
     { path: "/coupons", icon: <FiPackage />, label: "Coupons" },
     { path: "/settings", icon: <FiSettings />, label: "Settings" },
+    { path: "/generate-invoice", icon: <FiSettings />, label: "Generate Invoice" },
   ];
 
   const SidebarContent = () => (
