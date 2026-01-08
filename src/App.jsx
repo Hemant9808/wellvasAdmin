@@ -23,11 +23,14 @@ import useAuthStore from '../utils/authStore';
 import { useAuthMiddleware } from '../middleware';
 import OrderDetails from '../Pages/OrderDetails';
 import Messages from '../Pages/Messages';
+import InvoiceGenerator from '../Pages/InvoiceGenerator';
+import Reviews from '../Pages/Reviews';
+import Coupons from '../Pages/Coupons';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuthStore();
-  
+
   // if (!user) {
   //   return <Navigate to="/login" replace />;
   // }
@@ -38,7 +41,7 @@ const ProtectedRoute = ({ children }) => {
 // Root component that includes the auth middleware
 const Root = () => {
   useAuthMiddleware();
-  
+
   return <Layout />;
 };
 
@@ -51,7 +54,7 @@ const router = createBrowserRouter([
     path: '/',
     element: (
       // <ProtectedRoute>
-        <Root />
+      <Root />
       // </ProtectedRoute>
     ),
     children: [
@@ -68,6 +71,9 @@ const router = createBrowserRouter([
       { path: 'addproducts', element: <AddProduct /> },
       { path: 'orders/:id', element: <OrderDetails /> },
       { path: 'messages', element: <Messages /> },
+      { path: 'generate-invoice', element: <InvoiceGenerator /> },
+      { path: 'reviews', element: <Reviews /> },
+      { path: 'coupons', element: <Coupons /> },
       // { path: 'messages/:id', element: <singleMessage /> },
     ],
   },
