@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../utils/axios';
 import { toast } from 'react-hot-toast';
 import {
     CheckCircle,
@@ -22,8 +22,6 @@ const Reviews = () => {
         pages: 1,
         total: 0
     });
-    const API_BASE = 'http://localhost:4000'; // For local testing
-    // const API_BASE = 'https://ayucan.in'; // Production backend URL
 
     useEffect(() => {
         fetchReviews();
@@ -41,11 +39,7 @@ const Reviews = () => {
                 params.status = filter;
             }
 
-            console.log('Fetching reviews from:', `${API_BASE}/reviews/admin/all`);
-            console.log('Token:', localStorage.getItem('token'));
-            console.log('Params:', params);
-
-            const response = await axios.get(`${API_BASE}/reviews/admin/all`, {
+            const response = await axiosInstance.get('/reviews/admin/all', {
                 params,
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -67,8 +61,8 @@ const Reviews = () => {
 
     const approveReview = async (reviewId) => {
         try {
-            await axios.patch(
-                `${API_BASE}/reviews/admin/${reviewId}/approve`,
+            await axiosInstance.patch(
+                `/reviews/admin/${reviewId}/approve`,
                 {},
                 {
                     headers: {
@@ -87,8 +81,8 @@ const Reviews = () => {
 
     const rejectReview = async (reviewId) => {
         try {
-            await axios.patch(
-                `${API_BASE}/reviews/admin/${reviewId}/reject`,
+            await axiosInstance.patch(
+                `/reviews/admin/${reviewId}/reject`,
                 {},
                 {
                     headers: {
@@ -111,7 +105,7 @@ const Reviews = () => {
         }
 
         try {
-            await axios.delete(`${API_BASE}/reviews/${reviewId}`, {
+            await axiosInstance.delete(`/reviews/${reviewId}`, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`
                 }
