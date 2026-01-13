@@ -50,7 +50,7 @@ const Layout = () => {
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b">
         {isExpanded && (
-          <h1 className="text-xl font-bold text-gray-800">Wellvas Admin</h1>
+          <h1 className="text-xl font-bold text-gray-800">Ayucan Admin</h1>
         )}
         <button
           onClick={() => {

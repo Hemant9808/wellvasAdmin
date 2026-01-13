@@ -20,14 +20,14 @@ const InvoiceGenerator = () => {
         invoiceNumber: getNextInvoiceNumber(),
         invoiceDate: new Date().toISOString().split('T')[0],
         billTo: {
-            name: 'WELLVAS HEALTHCARE',
+            name: 'AYUCAN HEALTHCARE',
             address: 'Basement, E-46, Mohan Baba Nagar, Badarpur, New Delhi, South East Delhi, South Delhi, Delhi, 110044',
             gstin: '07JVTPK6524E1ZX',
             mobile: '9911324282',
             pan: 'JVTPK9524E'
         },
         shipTo: {
-            name: 'WELLVAS HEALTHCARE',
+            name: 'AYUCAN HEALTHCARE',
             address: 'Basement, E-46, Mohan Baba Nagar, Badarpur, New Delhi, South East Delhi, South Delhi, Delhi, 110044'
         },
         items: [

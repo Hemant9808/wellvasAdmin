@@ -106,7 +106,7 @@
 //     // Print invoice
 //     const printInvoice = () => {
 //         const printWindow = window.open('', '_blank');
-        
+
 //         // Create the complete invoice HTML content
 //         const invoiceHTML = `
 //             <html>
@@ -317,10 +317,10 @@
 //                 </body>
 //             </html>
 //         `;
-        
+
 //         printWindow.document.write(invoiceHTML);
 //         printWindow.document.close();
-        
+
 //         // Wait for content to load before printing
 //         printWindow.onload = () => {
 //             printWindow.focus();
@@ -366,42 +366,42 @@ function OrderDetails() {
     };
 
     const downloadInvoice = async () => {
-              if (!invoiceRef.current) return;
-      
-              try {
-                  const canvas = await html2canvas(invoiceRef.current, {
-                      scale: 2,
-                      useCORS: true,
-                      allowTaint: true,
-                      backgroundColor: '#ffffff',
-                      logging: false,
-                      removeContainer: true
-                  });
-      
-                  const imgData = canvas.toDataURL('image/png');
-                  const pdf = new jsPDF('p', 'mm', 'a4');
-                  const imgWidth = 210;
-                  const pageHeight = 295;
-                  const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                  let heightLeft = imgHeight;
-      
-                  let position = 0;
-      
-                  pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                  heightLeft -= pageHeight;
-      
-                  while (heightLeft >= 0) {
-                      position = heightLeft - imgHeight;
-                      pdf.addPage();
-                      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                      heightLeft -= pageHeight;
-                  }
-      
-                  pdf.save(`invoice-${order?._id}.pdf`);
-              } catch (error) {
-                  console.error('Error generating PDF:', error);
-              }
-          };
+        if (!invoiceRef.current) return;
+
+        try {
+            const canvas = await html2canvas(invoiceRef.current, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#ffffff',
+                logging: false,
+                removeContainer: true
+            });
+
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgWidth = 210;
+            const pageHeight = 295;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            let heightLeft = imgHeight;
+
+            let position = 0;
+
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+
+            pdf.save(`invoice-${order?._id}.pdf`);
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+        }
+    };
 
     useEffect(() => {
         fetchOrderDetails();
@@ -434,7 +434,7 @@ function OrderDetails() {
 
     // Generate QR code for order
     const generateQRCode = () => {
-        const orderUrl = `https://admin.wellvas.com/orders/${order?._id}`;
+        const orderUrl = `https://admin.ayucan.com/orders/${order?._id}`;
         return (
             <div ref={qrRef}>
                 <QRCode
@@ -452,14 +452,14 @@ function OrderDetails() {
     const generateBarcode = () => {
         return (
             <div ref={barcodeRef}>
-                <Barcode 
-                    value={order?._id || 'ORDER123'} 
-                    width={1} 
-                    height={40} 
+                <Barcode
+                    value={order?._id || 'ORDER123'}
+                    width={1}
+                    height={40}
                     fontSize={13}
-                    displayValue={true} 
-                    fontOptions="400" 
-                    textMargin={2} 
+                    displayValue={true}
+                    fontOptions="400"
+                    textMargin={2}
                     margin={0}
                 />
             </div>
@@ -469,7 +469,7 @@ function OrderDetails() {
     // Print invoice
     const printInvoice = () => {
         const printWindow = window.open('', '_blank');
-        
+
         // Create the complete invoice HTML content
         const invoiceHTML = `
             <html>
@@ -651,7 +651,7 @@ function OrderDetails() {
                         <!-- Order Information -->
                         <div>
                             <p><strong>Order ID:</strong> ${order?._id}</p>
-                            <p><strong>Order Date:</strong> ${new Date(order?.createdAt).toLocaleDateString('en-GB')}, ${new Date(order?.createdAt).toLocaleTimeString('en-GB', {hour: '2-digit', minute:'2-digit'})}</p>
+                            <p><strong>Order Date:</strong> ${new Date(order?.createdAt).toLocaleDateString('en-GB')}, ${new Date(order?.createdAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</p>
                             <p><strong>Invoice No:</strong> FAAP3K2100000084</p>
                             <p><strong>Invoice Date:</strong> ${new Date().toLocaleDateString('en-GB')}, 02:40 AM</p>
                         </div>
@@ -678,10 +678,10 @@ function OrderDetails() {
                 </body>
             </html>
         `;
-        
+
         printWindow.document.write(invoiceHTML);
         printWindow.document.close();
-        
+
         // Wait for content to load before printing
         printWindow.onload = () => {
             printWindow.focus();
@@ -700,12 +700,12 @@ function OrderDetails() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                 <h2 style={{ fontSize: '24px', fontWeight: '600' }}>Order Details</h2>
                 <div style={{ display: 'flex', gap: '8px' }}>
-                    <button 
+                    <button
                         onClick={downloadInvoice}
-                        style={{ 
-                            backgroundColor: '#3b82f6', 
-                            color: '#ffffff', 
-                            padding: '8px 16px', 
+                        style={{
+                            backgroundColor: '#3b82f6',
+                            color: '#ffffff',
+                            padding: '8px 16px',
                             borderRadius: '4px',
                             border: 'none',
                             cursor: 'pointer'
@@ -715,12 +715,12 @@ function OrderDetails() {
                     >
                         Download Invoice
                     </button>
-                    <button 
+                    <button
                         onClick={printInvoice}
-                        style={{ 
-                            backgroundColor: '#10b981', 
-                            color: '#ffffff', 
-                            padding: '8px 16px', 
+                        style={{
+                            backgroundColor: '#10b981',
+                            color: '#ffffff',
+                            padding: '8px 16px',
                             borderRadius: '4px',
                             border: 'none',
                             cursor: 'pointer'
@@ -730,12 +730,12 @@ function OrderDetails() {
                     >
                         Print Invoice
                     </button>
-                    <button 
-                        onClick={() => navigate('/')} 
-                        style={{ 
-                            backgroundColor: '#7bf249', 
-                            color: '#ffffff', 
-                            padding: '8px 16px', 
+                    <button
+                        onClick={() => navigate('/')}
+                        style={{
+                            backgroundColor: '#7bf249',
+                            color: '#ffffff',
+                            padding: '8px 16px',
                             borderRadius: '4px',
                             border: 'none',
                             cursor: 'pointer'
@@ -747,55 +747,55 @@ function OrderDetails() {
             </div>
 
             {/* Invoice Section */}
-            <div ref={invoiceRef} style={{ 
-                backgroundColor: '#ffffff', 
-                border: '1px solid #d1d5db', 
+            <div ref={invoiceRef} style={{
+                backgroundColor: '#ffffff',
+                border: '1px solid #d1d5db',
                 padding: '15px',
                 fontFamily: 'Arial, sans-serif',
                 fontSize: '0.9rem',
             }}>
                 {/* Header */}
-              {order?.paymentResult?.paymentStatus === 'paid' &&
-               <div style={{ textAlign: 'center'}}>
-                  <div style={{ 
-                    //light gray
+                {order?.paymentResult?.paymentStatus === 'paid' &&
+                    <div style={{ textAlign: 'center' }}>
+                        <div style={{
+                            //light gray
 
-                    backgroundColor:"#f0f0f0",
-                    fontSize: '0.9rem',
-                      color: 'black', 
-                      padding: '8px', 
-                      textAlign: 'left', 
-                      fontWeight: 'semibold', 
-                      marginBottom: '8px' 
-                  }}>
-                      PREPAID - DO NOT COLLECT CASH
-                  </div>
-              </div>}
+                            backgroundColor: "#f0f0f0",
+                            fontSize: '0.9rem',
+                            color: 'black',
+                            padding: '8px',
+                            textAlign: 'left',
+                            fontWeight: 'semibold',
+                            marginBottom: '8px'
+                        }}>
+                            PREPAID - DO NOT COLLECT CASH
+                        </div>
+                    </div>}
 
                 {/* Delivery Address */}
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <div style={{ marginBottom: '20px' }}>
-                    <h3 style={{ fontWeight: 'bold', fontSize: '0.9rem', marginBottom: '8px' }}>Customer Name: {order?.user?.firstName} {order?.user?.lastName }</h3>
-                    <div style={{ borderLeft: '4px solid #3b82f6',fontSize: '0.9rem', paddingLeft: '10px', marginTop: '5px' }}>
-                        <p>{order?.shippingAddress?.address || 'Address Line 1'}</p>    
-                        <p>{order?.shippingAddress?.city || 'City'}, {order?.shippingAddress?.postalCode || 'PIN'}</p>
-                        <p>{order?.shippingAddress?.state || 'State'}</p>
-                       
+                    <div style={{ marginBottom: '20px' }}>
+                        <h3 style={{ fontWeight: 'bold', fontSize: '0.9rem', marginBottom: '8px' }}>Customer Name: {order?.user?.firstName} {order?.user?.lastName}</h3>
+                        <div style={{ borderLeft: '4px solid #3b82f6', fontSize: '0.9rem', paddingLeft: '10px', marginTop: '5px' }}>
+                            <p>{order?.shippingAddress?.address || 'Address Line 1'}</p>
+                            <p>{order?.shippingAddress?.city || 'City'}, {order?.shippingAddress?.postalCode || 'PIN'}</p>
+                            <p>{order?.shippingAddress?.state || 'State'}</p>
+
+                        </div>
                     </div>
-                </div>
-                <div style={{ 
-                    width: '100px', 
-                    height: '100px', 
-                    backgroundColor: '#ffffff', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                    border: '1px solid #dddddd',
-                    flexDirection: 'column'
-                }}>
-                    {generateQRCode()}
-                    <div style={{ marginTop: '4px', fontWeight: 'bold', fontSize: '10px' }}>{order?._id?.slice(-8)}</div>
-                </div>
+                    <div style={{
+                        width: '100px',
+                        height: '100px',
+                        backgroundColor: '#ffffff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: '1px solid #dddddd',
+                        flexDirection: 'column'
+                    }}>
+                        {generateQRCode()}
+                        <div style={{ marginTop: '4px', fontWeight: 'bold', fontSize: '10px' }}>{order?._id?.slice(-8)}</div>
+                    </div>
                 </div>
 
 
@@ -845,13 +845,13 @@ function OrderDetails() {
                             <tr>
                                 <td style={{ border: '1px solid #dddddd', padding: '8px', textAlign: 'left' }}><strong>Shipping charge</strong></td>
                                 <td style={{ border: '1px solid #dddddd', padding: '8px', textAlign: 'left' }}><strong>0.00</strong></td>
-                                 </tr>
+                            </tr>
                             <tr>
                                 <td style={{ border: '1px solid #dddddd', padding: '8px', textAlign: 'left' }}><strong>Subtotal </strong></td>
                                 <td style={{ border: '1px solid #dddddd', padding: '8px', textAlign: 'left' }}><strong>₹{order?.totalPrice}</strong></td>
-                               </tr>
+                            </tr>
                             <tr>
-                                 <td style={{ border: '1px solid #dddddd', padding: '8px', textAlign: 'left' }}><strong>Total</strong></td>
+                                <td style={{ border: '1px solid #dddddd', padding: '8px', textAlign: 'left' }}><strong>Total</strong></td>
                                 <td style={{ border: '1px solid #dddddd', padding: '8px', textAlign: 'left' }}><strong>₹{order?.totalPrice}</strong></td>
                             </tr>
                         </tfoot>
@@ -860,12 +860,12 @@ function OrderDetails() {
 
                 <div style={{ borderTop: '1px dashed #ccc', margin: '15px 0' }}></div>
 
-                
+
 
                 {/* Order Information */}
                 <div>
                     <p><strong>Order ID:</strong> {order?._id}</p>
-                    <p><strong>Order Date:</strong> {new Date(order?.createdAt).toLocaleDateString('en-GB')}, {new Date(order?.createdAt).toLocaleTimeString('en-GB', {hour: '2-digit', minute:'2-digit'})}</p>
+                    <p><strong>Order Date:</strong> {new Date(order?.createdAt).toLocaleDateString('en-GB')}, {new Date(order?.createdAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</p>
                     <p><strong>Invoice No:</strong> FAAP3K2100000084</p>
                     <p><strong>Invoice Date:</strong> {new Date().toLocaleDateString('en-GB')}, 02:40 AM</p>
                 </div>
@@ -873,13 +873,13 @@ function OrderDetails() {
                 <div style={{ borderTop: '1px dashed #ccc', margin: '15px 0' }}></div>
 
                 {/* Special Instructions */}
-               
+
 
                 {/* Barcode Section */}
                 <div style={{ marginBottom: '16px' }}>
-                    <div style={{ 
-                        height: '4rem', 
-                        backgroundColor: '#f8f8f8', 
+                    <div style={{
+                        height: '4rem',
+                        backgroundColor: '#f8f8f8',
                         margin: '10px 0',
                         display: 'flex',
                         alignItems: 'center',
@@ -933,18 +933,18 @@ function OrderDetails() {
                 </div>
                 <div>
                     <h3 style={{ fontSize: '20px', fontWeight: '500', marginTop: '24px', marginBottom: '8px' }}>Coupon Applied : {order?.couponCode || 'N/A'}</h3>
-                    
+
                 </div>
 
                 <div>
                     <h3 style={{ fontSize: '20px', fontWeight: '500', marginTop: '24px', marginBottom: '8px' }}>Items</h3>
                     {order?.items?.map((item, idx) => (
-                        <div key={idx} style={{ 
-                            padding: '16px', 
-                            border: '1px solid #e5e7eb', 
-                            borderRadius: '6px', 
-                            marginBottom: '8px', 
-                            backgroundColor: '#f9fafb' 
+                        <div key={idx} style={{
+                            padding: '16px',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '6px',
+                            marginBottom: '8px',
+                            backgroundColor: '#f9fafb'
                         }}>
                             <p><strong>Product Name:</strong> {item?.productId?.name || 'Unknown Product'}</p>
                             <p><strong>Brand:</strong> {item?.productId?.brand || 'N/A'}</p>

@@ -69,7 +69,7 @@ const InvoiceTemplate = forwardRef(({ invoiceData }, ref) => {
                         <td style={{ border: '1px solid #000', padding: '10px', width: '50%', verticalAlign: 'top' }}>
                             <h4 style={{ margin: '0 0 5px 0', fontSize: '10pt' }}>BILL TO</h4>
                             <p style={{ fontSize: '9pt', lineHeight: '1.4', margin: '3px 0' }}>
-                                <strong>{billTo.name || 'WELLVAS HEALTHCARE'}</strong><br />
+                                <strong>{billTo.name || 'AYUCAN HEALTHCARE'}</strong><br />
                                 {billTo.address || 'Basement, E-46, Mohan Baba Nagar, Badarpur, New Delhi, South East Delhi, South Delhi, Delhi, 110044'}<br />
                                 <strong>GSTIN:</strong> {billTo.gstin || '07JVTPK6524E1ZX'} &nbsp;<br />
                                 <strong>Mobile:</strong> {billTo.mobile || '9911324282'} &nbsp; <strong>PAN Number:</strong> {billTo.pan || 'JVTPK9524E'}
@@ -78,7 +78,7 @@ const InvoiceTemplate = forwardRef(({ invoiceData }, ref) => {
                         <td style={{ border: '1px solid #000', padding: '10px', width: '50%', verticalAlign: 'top' }}>
                             <h4 style={{ margin: '0 0 5px 0', fontSize: '10pt' }}>SHIP TO</h4>
                             <p style={{ fontSize: '9pt', lineHeight: '1.4', margin: '3px 0' }}>
-                                <strong>{shipTo.name || 'WELLVAS HEALTHCARE'}</strong><br />
+                                <strong>{shipTo.name || 'AYUCAN HEALTHCARE'}</strong><br />
                                 {shipTo.address || 'Basement, E-46, Mohan Baba Nagar, Badarpur, New Delhi, South East Delhi, South Delhi, Delhi, 110044'}
                             </p>
                         </td>

@@ -8,7 +8,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
         } w-64 md:translate-x-0 md:static md:block`}
     >
       <div className="flex items-center justify-between p-4 md:hidden">
-        <h2 className="text-xl font-bold">Wellvas Admin</h2>
+        <h2 className="text-xl font-bold">Ayucan Admin</h2>
         <button onClick={toggleSidebar} className="text-gray-700 text-2xl">
           &times;
         </button>
