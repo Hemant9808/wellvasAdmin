@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../utils/axios';
 import { toast } from 'react-hot-toast';
 import {
     CheckCircle,
@@ -23,8 +23,6 @@ const Reviews = () => {
         total: 0
     });
 
-    const API_BASE = 'http://localhost:4000'; // Use local backend (production doesn't have review routes yet)
-
     useEffect(() => {
         fetchReviews();
     }, [filter, pagination.current]);
@@ -41,16 +39,9 @@ const Reviews = () => {
                 params.status = filter;
             }
 
-            console.log('Fetching reviews from:', `${API_BASE}/reviews/admin/all`);
-            console.log('Token:', localStorage.getItem('token'));
-            console.log('Params:', params);
+            console.log('Fetching reviews with params:', params);
 
-            const response = await axios.get(`${API_BASE}/reviews/admin/all`, {
-                params,
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            });
+            const response = await axiosInstance.get('/reviews/admin/all', { params });
 
             console.log('Reviews response:', response.data);
 
@@ -67,15 +58,7 @@ const Reviews = () => {
 
     const approveReview = async (reviewId) => {
         try {
-            await axios.patch(
-                `${API_BASE}/reviews/admin/${reviewId}/approve`,
-                {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`
-                    }
-                }
-            );
+            await axiosInstance.patch(`/reviews/admin/${reviewId}/approve`);
 
             toast.success('Review approved');
             fetchReviews();
@@ -87,15 +70,7 @@ const Reviews = () => {
 
     const rejectReview = async (reviewId) => {
         try {
-            await axios.patch(
-                `${API_BASE}/reviews/admin/${reviewId}/reject`,
-                {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`
-                    }
-                }
-            );
+            await axiosInstance.patch(`/reviews/admin/${reviewId}/reject`);
 
             toast.success('Review rejected');
             fetchReviews();
@@ -111,11 +86,7 @@ const Reviews = () => {
         }
 
         try {
-            await axios.delete(`${API_BASE}/reviews/admin/${reviewId}`, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            });
+            await axiosInstance.delete(`/reviews/admin/${reviewId}`);
 
             toast.success('Review deleted');
             fetchReviews();
