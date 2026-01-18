@@ -26,6 +26,8 @@ import Messages from '../Pages/Messages';
 import Reviews from './pages/Reviews';
 import Coupons from './pages/Coupons';
 import InvoiceGenerator from '../Pages/InvoiceGenerator';
+import OfflineCustomers from '../Pages/OfflineCustomers';
+import OfflineInvoices from '../Pages/OfflineInvoices';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -74,6 +76,8 @@ const router = createBrowserRouter([
       { path: 'reviews', element: <Reviews /> },
       { path: 'coupons', element: <Coupons /> },
       { path: 'generate-invoice', element: <InvoiceGenerator /> },
+      { path: 'offline-customers', element: <OfflineCustomers /> },
+      { path: 'offline-invoices', element: <OfflineInvoices /> },
       // { path: 'messages/:id', element: <singleMessage /> },
     ],
   },

@@ -2,44 +2,52 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { Download, Printer, Plus, Trash2, Save } from 'lucide-react';
+import { Download, Printer, Plus, Trash2, Save, Search, User, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import InvoiceTemplate from './InvoiceTemplate';
+import axiosInstance from '../utils/axios';
 
 const InvoiceGenerator = () => {
     const invoiceRef = useRef();
 
-    // Get next invoice number from localStorage
-    const getNextInvoiceNumber = () => {
-        const lastNumber = localStorage.getItem('lastInvoiceNumber');
-        const nextNumber = lastNumber ? parseInt(lastNumber) + 1 : 1;
-        return nextNumber.toString();
+    // Get next invoice number from database API
+    const fetchNextInvoiceNumber = async () => {
+        try {
+            const response = await axiosInstance.get('/offline-invoices/next-number');
+            return response.data.nextInvoiceNumber;
+        } catch (error) {
+            console.error('Error fetching next invoice number:', error);
+            // Fallback to INV-1 if API fails
+            return 'INV-1';
+        }
     };
 
+    // Customer selection state
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [customerSearch, setCustomerSearch] = useState('');
+    const [customerResults, setCustomerResults] = useState([]);
+    const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
+
+    // Payment tracking state
+    const [paymentStatus, setPaymentStatus] = useState('pending');
+    const [paymentMethod, setPaymentMethod] = useState('cash');
+    const [paidAmount, setPaidAmount] = useState(0);
+
     const [invoiceData, setInvoiceData] = useState({
-        invoiceNumber: getNextInvoiceNumber(),
+        invoiceNumber: '', // Will be fetched from API
         invoiceDate: new Date().toISOString().split('T')[0],
         billTo: {
-            name: 'AYUCAN HEALTHCARE',
-            address: 'Basement, E-46, Mohan Baba Nagar, Badarpur, New Delhi, South East Delhi, South Delhi, Delhi, 110044',
-            gstin: '07JVTPK6524E1ZX',
-            mobile: '9911324282',
-            pan: 'JVTPK9524E'
+            name: '',
+            address: '',
+            gstin: '',
+            mobile: '',
+            pan: ''
         },
         shipTo: {
-            name: 'AYUCAN HEALTHCARE',
-            address: 'Basement, E-46, Mohan Baba Nagar, Badarpur, New Delhi, South East Delhi, South Delhi, Delhi, 110044'
+            name: '',
+            address: ''
         },
-        items: [
-            {
-                name: 'Shilajit Product 420gm (Normal AGI Glass jar)',
-                description: 'Ad jart wads golden caps tableks laminatios simbulle lab reporters Golden spoon + outer box outer box lamination +MGB warillaminaion',
-                hsn: '30039011',
-                quantity: 222,
-                rate: 195,
-                amount: 43290
-            }
-        ],
+        items: [],
         bankDetails: {
             name: 'Ayucan Healthcare',
             ifsc: '',
@@ -48,6 +56,18 @@ const InvoiceGenerator = () => {
         },
         paymentQRData: 'devashishraj8271@oksbi'
     });
+
+    // Fetch next invoice number from database on component mount
+    useEffect(() => {
+        const initializeInvoiceNumber = async () => {
+            const nextNumber = await fetchNextInvoiceNumber();
+            setInvoiceData(prev => ({
+                ...prev,
+                invoiceNumber: nextNumber
+            }));
+        };
+        initializeInvoiceNumber();
+    }, []);
 
     // Save invoice number to localStorage when downloading/printing
     const saveInvoiceNumber = () => {
@@ -155,10 +175,156 @@ const InvoiceGenerator = () => {
         }));
     };
 
+    // Search customers
+    const searchCustomers = async (query) => {
+        if (!query || query.length < 2) {
+            setCustomerResults([]);
+            return;
+        }
+
+        try {
+            const response = await axiosInstance.get('/offline-customers', {
+                params: { search: query, limit: 10 }
+            });
+            setCustomerResults(response.data.customers || []);
+        } catch (error) {
+            console.error('Error searching customers:', error);
+        }
+    };
+
+    // Handle customer selection
+    const selectCustomer = (customer) => {
+        setSelectedCustomer(customer);
+        setCustomerSearch(customer.name);
+        setShowCustomerDropdown(false);
+
+        // Auto-fill customer details
+        setInvoiceData(prev => ({
+            ...prev,
+            billTo: {
+                name: customer.name,
+                address: customer.address?.fullAddress || '',
+                gstin: customer.gstin || '',
+                mobile: customer.phone || '',
+                pan: customer.pan || ''
+            },
+            shipTo: {
+                name: customer.name,
+                address: customer.address?.fullAddress || ''
+            }
+        }));
+    };
+
+    // Clear customer selection
+    const clearCustomer = () => {
+        setSelectedCustomer(null);
+        setCustomerSearch('');
+        setInvoiceData(prev => ({
+            ...prev,
+            billTo: {
+                name: '',
+                address: '',
+                gstin: '',
+                mobile: '',
+                pan: ''
+            }
+        }));
+    };
+
+    // Save invoice to database
+    const saveInvoiceToDatabase = async () => {
+        try {
+            // Validation
+            if (!invoiceData.items || invoiceData.items.length === 0) {
+                toast.error('Please add at least one item to the invoice');
+                throw new Error('No items in invoice');
+            }
+
+            if (!invoiceData.billTo.name || invoiceData.billTo.name.trim() === '') {
+                toast.error('Customer name is required');
+                throw new Error('Customer name missing');
+            }
+
+            const invoicePayload = {
+                invoiceNumber: invoiceData.invoiceNumber,
+                invoiceDate: invoiceData.invoiceDate,
+                customerId: selectedCustomer?._id,
+                customerSnapshot: {
+                    name: invoiceData.billTo.name,
+                    phone: invoiceData.billTo.mobile,
+                    email: selectedCustomer?.email || '',
+                    address: invoiceData.billTo.address,
+                    gstin: invoiceData.billTo.gstin,
+                    pan: invoiceData.billTo.pan
+                },
+                items: invoiceData.items,
+                subtotal: parseFloat(totals.subtotal),
+                cgst: parseFloat(totals.cgst),
+                sgst: parseFloat(totals.sgst),
+                total: parseFloat(totals.total),
+                amountInWords,
+                paymentStatus,
+                paymentMethod,
+                paidAmount: parseFloat(paidAmount) || 0,
+                shipTo: invoiceData.shipTo,
+                bankDetails: invoiceData.bankDetails,
+                upiId: invoiceData.paymentQRData
+            };
+
+            toast.loading('Saving invoice to database...', { id: 'save-invoice' });
+
+            console.log('Sending invoice payload:', invoicePayload); // Debug log
+            if (!invoicePayload.customerId) {
+                console.warn('⚠️ WARNING: Invoice being saved WITHOUT customer link!');
+            }
+
+            const response = await axiosInstance.post('/offline-invoices', invoicePayload);
+
+            toast.success(`Invoice ${invoiceData.invoiceNumber} saved successfully! 🎉`, {
+                id: 'save-invoice',
+                duration: 3000
+            });
+
+            // Fetch next invoice number from database for the next invoice
+            const nextNumber = await fetchNextInvoiceNumber();
+            setInvoiceData(prev => ({ ...prev, invoiceNumber: nextNumber }));
+
+            return response.data.invoice;
+        } catch (error) {
+            console.error('Error saving invoice:', error);
+            console.error('Error response:', error.response?.data); // Debug log
+
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to save invoice. Please try again.';
+
+            toast.error(errorMessage, {
+                id: 'save-invoice',
+                duration: 4000
+            });
+            throw error;
+        }
+    };
+
+    // Handle customer search input change
+    useEffect(() => {
+        const delayDebounce = setTimeout(() => {
+            if (customerSearch) {
+                searchCustomers(customerSearch);
+            }
+        }, 300);
+
+        return () => clearTimeout(delayDebounce);
+    }, [customerSearch]);
+
+
     // Download PDF
     const downloadPDF = async () => {
         try {
-            toast.loading('Generating PDF...');
+            // First save to database if items exist
+            if (invoiceData.items.length > 0 && invoiceData.billTo.name) {
+                await saveInvoiceToDatabase();
+            }
+
+            toast.loading('Generating PDF...', { id: 'pdf-download' });
 
             // Create a temporary container for full-size invoice
             const tempContainer = document.createElement('div');
@@ -207,16 +373,22 @@ const InvoiceGenerator = () => {
 
             pdf.save(`Invoice_${invoiceData.invoiceNumber}_${new Date().toISOString().split('T')[0]}.pdf`);
 
-            // Save current invoice number and generate next
+            // Save current invoice number for reference
             saveInvoiceNumber();
-            const nextNumber = (parseInt(invoiceData.invoiceNumber) + 1).toString();
+
+            // Fetch next invoice number from database
+            const nextNumber = await fetchNextInvoiceNumber();
             setInvoiceData(prev => ({ ...prev, invoiceNumber: nextNumber }));
 
-            toast.dismiss();
-            toast.success('PDF downloaded successfully!');
+            toast.success(`Invoice ${invoiceData.invoiceNumber} - PDF downloaded successfully! 📄`, {
+                id: 'pdf-download',
+                duration: 3000
+            });
         } catch (error) {
-            toast.dismiss();
-            toast.error('Failed to generate PDF');
+            toast.error('Failed to generate PDF. Please try again.', {
+                id: 'pdf-download',
+                duration: 4000
+            });
             console.error('PDF Error:', error);
         }
     };
@@ -249,8 +421,8 @@ const InvoiceGenerator = () => {
 
             // Save and increment invoice number
             saveInvoiceNumber();
-            setTimeout(() => {
-                const nextNumber = (parseInt(invoiceData.invoiceNumber) + 1).toString();
+            setTimeout(async () => {
+                const nextNumber = await fetchNextInvoiceNumber();
                 setInvoiceData(prev => ({ ...prev, invoiceNumber: nextNumber }));
             }, 100);
         }, 500);
@@ -298,6 +470,76 @@ const InvoiceGenerator = () => {
                                     />
                                 </div>
                             </div>
+                        </motion.div>
+
+                        {/* Customer Selection Card */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.05 }}
+                            className="bg-white rounded-2xl shadow-lg p-6 border border-[#715036]/10"
+                        >
+                            <h2 className="text-xl font-bold text-[#2A3B28] mb-4">Select Customer</h2>
+                            <div className="relative">
+                                <div className="flex gap-2">
+                                    <div className="flex-1 relative">
+                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                                        <input
+                                            type="text"
+                                            placeholder="Search customer by name or phone..."
+                                            value={customerSearch}
+                                            onChange={(e) => {
+                                                setCustomerSearch(e.target.value);
+                                                setShowCustomerDropdown(true);
+                                            }}
+                                            onFocus={() => setShowCustomerDropdown(true)}
+                                            className="w-full pl-10 pr-4 py-2 border border-[#715036]/20 rounded-lg focus:ring-2 focus:ring-[#C17C3A] focus:border-transparent"
+                                        />
+                                        {selectedCustomer && (
+                                            <button
+                                                onClick={clearCustomer}
+                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500 hover:text-red-700"
+                                            >
+                                                <X size={18} />
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Customer Dropdown */}
+                                {showCustomerDropdown && customerResults.length > 0 && (
+                                    <div className="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                        {customerResults.map((customer) => (
+                                            <div
+                                                key={customer._id}
+                                                onClick={() => selectCustomer(customer)}
+                                                className="p-3 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
+                                            >
+                                                <div className="flex items-center justify-between">
+                                                    <div>
+                                                        <p className="font-semibold text-gray-900">{customer.name}</p>
+                                                        <p className="text-sm text-gray-600">{customer.phone}</p>
+                                                    </div>
+                                                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                                                        {customer.customerType}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {selectedCustomer && (
+                                <div className="mt-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                                    <div className="flex items-center gap-2 text-green-700">
+                                        <User size={16} />
+                                        <span className="text-sm font-semibold">
+                                            Selected: {selectedCustomer.name} - ₹{selectedCustomer.totalSpent?.toLocaleString() || 0} spent
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
                         </motion.div>
 
                         {/* Bill To Card */}
@@ -435,8 +677,104 @@ const InvoiceGenerator = () => {
                             </div>
                         </motion.div>
 
+                        {/* Payment Details Card */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                            className="bg-white rounded-2xl shadow-lg p-6 border border-[#715036]/10"
+                        >
+                            <h2 className="text-xl font-bold text-[#2A3B28] mb-4">Payment Details</h2>
+                            <div className="grid grid-cols-3 gap-4">
+                                <div>
+                                    <label className="block text-sm font-semibold text-[#715036] mb-1">Payment Status</label>
+                                    <select
+                                        value={paymentStatus}
+                                        onChange={(e) => setPaymentStatus(e.target.value)}
+                                        className="w-full px-3 py-2 border border-[#715036]/20 rounded-lg focus:ring-2 focus:ring-[#C17C3A] focus:border-transparent"
+                                    >
+                                        <option value="pending">Pending</option>
+                                        <option value="paid">Paid</option>
+                                        <option value="partial">Partial</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-semibold text-[#715036] mb-1">Payment Method</label>
+                                    <select
+                                        value={paymentMethod}
+                                        onChange={(e) => setPaymentMethod(e.target.value)}
+                                        className="w-full px-3 py-2 border border-[#715036]/20 rounded-lg focus:ring-2 focus:ring-[#C17C3A] focus:border-transparent"
+                                    >
+                                        <option value="cash">Cash</option>
+                                        <option value="upi">UPI</option>
+                                        <option value="card">Card</option>
+                                        <option value="netbanking">Net Banking</option>
+                                        <option value="cheque">Cheque</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-semibold text-[#715036] mb-1">Paid Amount</label>
+                                    <input
+                                        type="number"
+                                        value={paidAmount}
+                                        onChange={(e) => setPaidAmount(e.target.value)}
+                                        placeholder="0.00"
+                                        className="w-full px-3 py-2 border border-[#715036]/20 rounded-lg focus:ring-2 focus:ring-[#C17C3A] focus:border-transparent"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="mt-4 p-3 bg-[#FDFBF7] rounded-lg">
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-[#715036]">Total Amount:</span>
+                                    <span className="font-bold text-[#2A3B28]">₹{totals.total}</span>
+                                </div>
+                                {paidAmount > 0 && (
+                                    <>
+                                        <div className="flex justify-between text-sm mt-1">
+                                            <span className="text-[#715036]">Paid Amount:</span>
+                                            <span className="font-semibold text-green-600">₹{parseFloat(paidAmount).toFixed(2)}</span>
+                                        </div>
+                                        <div className="flex justify-between text-sm mt-1">
+                                            <span className="text-[#715036]">Due Amount:</span>
+                                            <span className="font-semibold text-red-600">
+                                                ₹{(parseFloat(totals.total) - parseFloat(paidAmount)).toFixed(2)}
+                                            </span>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </motion.div>
+
                         {/* Action Buttons */}
                         <div className="flex gap-4">
+                            {/* Save to Database Button */}
+                            <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={async () => {
+                                    if (invoiceData.items.length === 0) {
+                                        toast.error('Please add at least one item');
+                                        return;
+                                    }
+                                    if (!invoiceData.billTo.name) {
+                                        toast.error('Please select a customer or enter customer details');
+                                        return;
+                                    }
+                                    try {
+                                        await saveInvoiceToDatabase();
+                                    } catch (error) {
+                                        // Error already shown in function
+                                    }
+                                }}
+                                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold shadow-lg no-print"
+                            >
+                                <Save size={20} /> Save Invoice
+                            </motion.button>
+
+                            {/* Download PDF Button */}
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
@@ -445,6 +783,8 @@ const InvoiceGenerator = () => {
                             >
                                 <Download size={20} /> Download PDF
                             </motion.button>
+
+                            {/* Print Button */}
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
@@ -476,7 +816,7 @@ const InvoiceGenerator = () => {
                 </div>
             </div>
 
-        </div>
+        </div >
     );
 };
 

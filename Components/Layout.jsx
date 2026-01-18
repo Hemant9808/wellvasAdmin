@@ -35,6 +35,8 @@ const Layout = () => {
     { path: "/", icon: <FiShoppingCart />, label: "Dashboard" },
     { path: "/products", icon: <FiShoppingBag />, label: "Products" },
     { path: "/customers", icon: <FiUsers />, label: "Customers" },
+    { path: "/offline-customers", icon: <FiUsers />, label: "Offline Customers" },
+    { path: "/offline-invoices", icon: <FiFileText />, label: "Invoice History" },
     { path: "/add-blogs", icon: <FiFileText />, label: "Blogs" },
     // { path: '/analysis', icon: <FiBarChart2 />, label: 'Analysis' },
     { path: "/addproducts", icon: <FiPackage />, label: "Add Product" },
