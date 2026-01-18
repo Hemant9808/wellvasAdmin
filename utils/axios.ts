@@ -2,9 +2,8 @@
 
 import axios from 'axios';
 
-// const baseURL = 'http://localhost:4000'; // Local backend for testing
-const baseURL = 'https://ayucan.in'; // Production backend
-// const baseURL = import.meta.env.VITE_API_URL;
+// const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+const baseURL = import.meta.env.VITE_API_URL || 'https://ayucan.in';
 
 const axiosInstance = axios.create({
   baseURL,
@@ -17,7 +16,6 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
-    config.headers.Authorization = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZTE1NzFmZWM4M2VlM2E4OGJjNzI4YSIsImlhdCI6MTcyNjQxMzc1OX0.QH1quEr3Hakn0Ku4h7GSLbAlyrr1tj3QkEeeH9OooC0`;
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -33,11 +31,12 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    // if (error.response?.status === 401) {
-    //   // Handle unauthorized access
-    //   localStorage.removeItem('token');
-    //   window.location.href = '/login';
-    // }
+    if (error.response?.status === 401) {
+      // Handle unauthorized access
+      localStorage.removeItem('token');
+      localStorage.removeItem('authStorage');
+      window.location.href = '/login';
+    }
     return Promise.reject(error);
   }
 );
