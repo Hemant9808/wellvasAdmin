@@ -45,6 +45,7 @@ const Layout = () => {
     { path: "/coupons", icon: <FiPackage />, label: "Coupons" },
     { path: "/settings", icon: <FiSettings />, label: "Settings" },
     { path: "/generate-invoice", icon: <FiSettings />, label: "Generate Invoice" },
+    { path: "/rewards", icon: <FiSettings />, label: "Rewards" },
   ];
 
   const SidebarContent = () => (
@@ -130,7 +131,7 @@ const Layout = () => {
   );
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-100">
+    <div className="flex h-screen bg-gray-100">
       {/* Mobile Sidebar */}
       <div
         className={`fixed top-0 left-0 z-50 h-full bg-white shadow-lg transition-transform duration-300 w-64 md:hidden ${isMobileOpen ? "translate-x-0" : "-translate-x-full"

@@ -25,6 +25,7 @@ import OrderDetails from '../Pages/OrderDetails';
 import Messages from '../Pages/Messages';
 import Reviews from './pages/Reviews';
 import Coupons from './pages/Coupons';
+import Rewards from '../Pages/Rewards';
 import InvoiceGenerator from '../Pages/InvoiceGenerator';
 import OfflineCustomers from '../Pages/OfflineCustomers';
 import OfflineInvoices from '../Pages/OfflineInvoices';
@@ -75,6 +76,7 @@ const router = createBrowserRouter([
       { path: 'messages', element: <Messages /> },
       { path: 'reviews', element: <Reviews /> },
       { path: 'coupons', element: <Coupons /> },
+      { path: 'rewards', element: <Rewards /> },
       { path: 'generate-invoice', element: <InvoiceGenerator /> },
       { path: 'offline-customers', element: <OfflineCustomers /> },
       { path: 'offline-invoices', element: <OfflineInvoices /> },
