@@ -71,15 +71,17 @@ const InvoiceTemplate = forwardRef(({ invoiceData }, ref) => {
                             <p style={{ fontSize: '9pt', lineHeight: '1.4', margin: '3px 0' }}>
                                 <strong>{billTo.name || 'AYUCAN HEALTHCARE'}</strong><br />
                                 {billTo.address || 'Basement, E-46, Mohan Baba Nagar, Badarpur, New Delhi, South East Delhi, South Delhi, Delhi, 110044'}<br />
-                                <strong>GSTIN:</strong> {billTo.gstin || '07JVTPK6524E1ZX'} &nbsp;<br />
-                                <strong>Mobile:</strong> {billTo.mobile || '9911324282'} &nbsp; <strong>PAN Number:</strong> {billTo.pan || 'JVTPK9524E'}
+                                <strong>GSTIN:</strong> {billTo.gstin || '07JVTPK6524E1ZX'}<br />
+                                <strong>Mobile:</strong> {billTo.mobile || '9911324282'}
                             </p>
                         </td>
                         <td style={{ border: '1px solid #000', padding: '10px', width: '50%', verticalAlign: 'top' }}>
                             <h4 style={{ margin: '0 0 5px 0', fontSize: '10pt' }}>SHIP TO</h4>
                             <p style={{ fontSize: '9pt', lineHeight: '1.4', margin: '3px 0' }}>
-                                <strong>{shipTo.name || 'AYUCAN HEALTHCARE'}</strong><br />
-                                {shipTo.address || 'Basement, E-46, Mohan Baba Nagar, Badarpur, New Delhi, South East Delhi, South Delhi, Delhi, 110044'}
+                                <strong>{shipTo.name || billTo.name || 'AYUCAN HEALTHCARE'}</strong><br />
+                                {shipTo.address || billTo.address || 'Basement, E-46, Mohan Baba Nagar, Badarpur, New Delhi, South East Delhi, South Delhi, Delhi, 110044'}<br />
+                                <strong>GSTIN:</strong> {billTo.gstin || '07JVTPK6524E1ZX'}<br />
+                                <strong>Mobile:</strong> {billTo.mobile || '9911324282'}
                             </p>
                         </td>
                     </tr>
@@ -160,9 +162,9 @@ const InvoiceTemplate = forwardRef(({ invoiceData }, ref) => {
                                 <h4 style={{ margin: '0 0 8px 0', fontSize: '10pt' }}>Bank Details</h4>
                                 <p style={{ fontSize: '9pt', lineHeight: '1.6', margin: 0 }}>
                                     <strong>Name:</strong> {bankDetails.name || 'Ayucan Healthcare'}<br />
-                                    <strong>IFSC Code:</strong> {bankDetails.ifsc || ''}<br />
-                                    <strong>Account No:</strong> {bankDetails.account || ''}<br />
-                                    <strong>Bank:</strong> {bankDetails.bank || ''}
+                                    <strong>IFSC Code:</strong> {bankDetails.ifsc || 'CBIN0280299'}<br />
+                                    <strong>Account No:</strong> {bankDetails.account || '5927753739'}<br />
+                                    <strong>Bank:</strong> {bankDetails.bank || 'Central Bank Of India'}
                                 </p>
                             </div>
                         </td>
@@ -170,7 +172,7 @@ const InvoiceTemplate = forwardRef(({ invoiceData }, ref) => {
                             <div style={{ border: '1px solid #000', padding: '10px', textAlign: 'center' }}>
                                 <h4 style={{ margin: '0 0 8px 0', fontSize: '10pt' }}>Payment QR Code</h4>
                                 <img
-                                    src="/Payment QR code.png"
+                                    src="/Payment.png"
                                     alt="Payment QR Code"
                                     style={{ width: '100px', height: '100px', objectFit: 'contain' }}
                                 />
@@ -195,7 +197,12 @@ const InvoiceTemplate = forwardRef(({ invoiceData }, ref) => {
             </div>
 
             {/* Authorized Signature */}
-            <div style={{ textAlign: 'right', paddingTop: '40px' }}>
+            <div style={{ textAlign: 'right', paddingTop: '10px' }}>
+                <img
+                    src="/aman sign.jpeg"
+                    alt="Authorized Signature"
+                    style={{ width: '120px', height: '60px', objectFit: 'contain', display: 'block', marginLeft: 'auto' }}
+                />
                 <p style={{ fontSize: '10pt', margin: 0, fontWeight: 'bold' }}>Authorised Signatory For</p>
                 <p style={{ fontSize: '10pt', margin: '5px 0 0 0', fontWeight: 'bold' }}>AYUCAN HEALTHCARE</p>
             </div>

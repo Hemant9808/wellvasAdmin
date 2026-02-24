@@ -288,6 +288,9 @@ const OfflineCustomers = () => {
                                         <div className="text-sm">
                                             <p className="text-gray-900">₹{customer.totalSpent?.toLocaleString() || 0}</p>
                                             <p className="text-xs text-gray-500">{customer.totalPurchases || 0} purchases</p>
+                                            {customer.totalDue > 0 && (
+                                                <p className="text-xs text-red-600 font-semibold mt-1">Due: ₹{customer.totalDue?.toLocaleString() || 0}</p>
+                                            )}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">

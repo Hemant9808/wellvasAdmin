@@ -569,11 +569,22 @@ function OrderDetails() {
                             <div class="prepaid-notice">PREPAID - DO NOT COLLECT CASH</div>
                         </div>
 
-                                                 <!-- Delivery Address -->
+                                                 <!-- Bill To and Ship To Section -->
                          <div class="delivery-section" style="display: flex; justify-content: space-between;">
                              <div style="flex: 1;">
-                                 <h3 style="font-weight: bold; font-size: 16px; margin-bottom: 4px;">Customer Name: ${order?.user?.FirstName} ${order?.user?.lastName}</h3>
+                                 <!-- Bill To -->
+                                 <h3 style="font-weight: bold; font-size: 16px; margin-bottom: 4px;">Bill To:</h3>
+                                 <div class="address-block" style="margin-bottom: 10px;">
+                                     <p style="font-weight: bold;">${order?.user?.firstName} ${order?.user?.lastName}</p>
+                                     <p>${order?.shippingAddress?.address || 'Address Line 1'}</p>
+                                     <p>${order?.shippingAddress?.city || 'City'}, ${order?.shippingAddress?.postalCode || 'PIN'}</p>
+                                     <p>${order?.shippingAddress?.state || 'State'}</p>
+                                 </div>
+                                 
+                                 <!-- Ship To -->
+                                 <h3 style="font-weight: bold; font-size: 16px; margin-bottom: 4px; margin-top: 8px;">Ship To:</h3>
                                  <div class="address-block">
+                                     <p style="font-weight: bold;">${order?.user?.firstName} ${order?.user?.lastName}</p>
                                      <p>${order?.shippingAddress?.address || 'Address Line 1'}</p>
                                      <p>${order?.shippingAddress?.city || 'City'}, ${order?.shippingAddress?.postalCode || 'PIN'}</p>
                                      <p>${order?.shippingAddress?.state || 'State'}</p>
@@ -772,15 +783,26 @@ function OrderDetails() {
                         </div>
                     </div>}
 
-                {/* Delivery Address */}
+                {/* Bill To and Ship To Section */}
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <div style={{ marginBottom: '20px' }}>
-                        <h3 style={{ fontWeight: 'bold', fontSize: '0.9rem', marginBottom: '8px' }}>Customer Name: {order?.user?.firstName} {order?.user?.lastName}</h3>
-                        <div style={{ borderLeft: '4px solid #3b82f6', fontSize: '0.9rem', paddingLeft: '10px', marginTop: '5px' }}>
+                        {/* Bill To */}
+                        <h3 style={{ fontWeight: 'bold', fontSize: '0.9rem', marginBottom: '8px' }}>Bill To:</h3>
+                        <div style={{ borderLeft: '4px solid #3b82f6', fontSize: '0.9rem', paddingLeft: '10px', marginTop: '5px', marginBottom: '15px' }}>
+                            <p style={{ fontWeight: 'bold' }}>{order?.user?.firstName} {order?.user?.lastName}</p>
                             <p>{order?.shippingAddress?.address || 'Address Line 1'}</p>
                             <p>{order?.shippingAddress?.city || 'City'}, {order?.shippingAddress?.postalCode || 'PIN'}</p>
                             <p>{order?.shippingAddress?.state || 'State'}</p>
+                        </div>
 
+                        {/* Ship To */}
+                        <h3 style={{ fontWeight: 'bold', fontSize: '0.9rem', marginBottom: '8px', marginTop: '10px' }}>Ship To:</h3>
+                        <div style={{ borderLeft: '4px solid #3b82f6', fontSize: '0.9rem', paddingLeft: '10px', marginTop: '5px' }}>
+                            <p style={{ fontWeight: 'bold' }}>{order?.user?.firstName} {order?.user?.lastName}</p>
+                            <p>{order?.shippingAddress?.address || 'Address Line 1'}</p>
+                            <p>{order?.shippingAddress?.city || 'City'}, {order?.shippingAddress?.postalCode || 'PIN'}</p>
+                            <p>{order?.shippingAddress?.state || 'State'}</p>
+                            <p style={{ marginTop: '4px', fontSize: '12px' }}>SURFACE</p>
                         </div>
                     </div>
                     <div style={{
