@@ -28,6 +28,10 @@ const InvoiceGenerator = () => {
     const [customerResults, setCustomerResults] = useState([]);
     const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
 
+    // GST rate state
+    const [cgstRate, setCgstRate] = useState(0);
+    const [sgstRate, setSgstRate] = useState(0);
+
     // Payment tracking state
     const [paymentStatus, setPaymentStatus] = useState('pending');
     const [paymentMethod, setPaymentMethod] = useState('cash');
@@ -77,8 +81,8 @@ const InvoiceGenerator = () => {
     // Calculate totals
     const calculateTotals = (items) => {
         const subtotal = items.reduce((sum, item) => sum + (item.amount || 0), 0);
-        const cgst = subtotal * 0.025; // 2.5%
-        const sgst = subtotal * 0.025; // 2.5%
+        const cgst = subtotal * (parseFloat(cgstRate) || 0) / 100;
+        const sgst = subtotal * (parseFloat(sgstRate) || 0) / 100;
         const total = subtotal + cgst + sgst;
 
         return {
@@ -662,12 +666,38 @@ const InvoiceGenerator = () => {
                                     <span className="text-[#715036]">Subtotal:</span>
                                     <span className="font-semibold text-[#2A3B28]">₹{totals.subtotal}</span>
                                 </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-[#715036]">CGST (2.5%):</span>
+                                <div className="flex items-center justify-between text-sm gap-2">
+                                    <div className="flex items-center gap-2 text-[#715036]">
+                                        <span>CGST</span>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            max="100"
+                                            step="0.5"
+                                            value={cgstRate}
+                                            onChange={(e) => setCgstRate(e.target.value)}
+                                            className="w-16 px-2 py-1 border border-[#715036]/30 rounded-lg text-center text-sm focus:ring-2 focus:ring-[#C17C3A] focus:border-transparent"
+                                            placeholder="0"
+                                        />
+                                        <span>%</span>
+                                    </div>
                                     <span className="font-semibold text-[#2A3B28]">₹{totals.cgst}</span>
                                 </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-[#715036]">SGST (2.5%):</span>
+                                <div className="flex items-center justify-between text-sm gap-2">
+                                    <div className="flex items-center gap-2 text-[#715036]">
+                                        <span>SGST</span>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            max="100"
+                                            step="0.5"
+                                            value={sgstRate}
+                                            onChange={(e) => setSgstRate(e.target.value)}
+                                            className="w-16 px-2 py-1 border border-[#715036]/30 rounded-lg text-center text-sm focus:ring-2 focus:ring-[#C17C3A] focus:border-transparent"
+                                            placeholder="0"
+                                        />
+                                        <span>%</span>
+                                    </div>
                                     <span className="font-semibold text-[#2A3B28]">₹{totals.sgst}</span>
                                 </div>
                                 <div className="flex justify-between text-lg font-bold pt-2 border-t border-[#715036]/20">
@@ -806,7 +836,9 @@ const InvoiceGenerator = () => {
                                     invoiceData={{
                                         ...invoiceData,
                                         ...totals,
-                                        amountInWords
+                                        amountInWords,
+                                        cgstRate,
+                                        sgstRate
                                     }}
                                 />
                             </div>

@@ -14,7 +14,9 @@ const InvoiceTemplate = forwardRef(({ invoiceData }, ref) => {
         total = 0,
         amountInWords = '',
         bankDetails = {},
-        paymentQRData = ''
+        paymentQRData = '',
+        cgstRate = 0,
+        sgstRate = 0
     } = invoiceData;
 
     const formatDate = (date) => {
@@ -118,7 +120,7 @@ const InvoiceTemplate = forwardRef(({ invoiceData }, ref) => {
                     {/* Tax Rows */}
                     <tr>
                         <td colSpan="5" style={{ border: '1px solid #000', padding: '8px', fontSize: '9pt', textAlign: 'right' }}>
-                            <strong>CGST @2.5%</strong>
+                            <strong>CGST @{cgstRate}%</strong>
                         </td>
                         <td style={{ border: '1px solid #000', padding: '8px', fontSize: '9pt', textAlign: 'right' }}>
                             ₹ {cgst}
@@ -126,7 +128,7 @@ const InvoiceTemplate = forwardRef(({ invoiceData }, ref) => {
                     </tr>
                     <tr>
                         <td colSpan="5" style={{ border: '1px solid #000', padding: '8px', fontSize: '9pt', textAlign: 'right' }}>
-                            <strong>SGST @2.5%</strong>
+                            <strong>SGST @{sgstRate}%</strong>
                         </td>
                         <td style={{ border: '1px solid #000', padding: '8px', fontSize: '9pt', textAlign: 'right' }}>
                             ₹ {sgst}
